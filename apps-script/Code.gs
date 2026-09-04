@@ -11,9 +11,9 @@
  */
 
 // ======================= CONFIGURAÇÃO =======================
-const SPREADSHEET_ID = 'COLE_AQUI_O_ID_DA_SUA_PLANILHA';
+const SPREADSHEET_ID = '1-788_56OT5L5sJyHl1kJwpMvKDSvlRvp6wdW4urdIBE';
 const SHEET_LOG = 'Log';
-const SECRET_TOKEN = 'COLE_AQUI_UM_TOKEN_SECRETO_ALEATORIO'; // gere um UUID qualquer
+const SECRET_TOKEN = 'c608aa965e214d17a323d82a7c4e2d04';
 
 // ======================= ROTEAMENTO =======================
 function doGet(e) {
@@ -58,8 +58,10 @@ function jsonResponse(obj) {
 function listarTasksPendentes() {
   const listas = Tasks.Tasklists.list().items || [];
   let todas = [];
+  let listasInfo = [];
 
   listas.forEach(function (lista) {
+    listasInfo.push({ id: lista.id, titulo: lista.title });
     const resultado = Tasks.Tasks.list(lista.id, {
       showCompleted: false,
       maxResults: 100
@@ -70,14 +72,16 @@ function listarTasksPendentes() {
       todas.push({
         id: t.id,
         listId: lista.id,
+        listaNome: lista.title,
         titulo: t.title,
+        notes: t.notes || '',
         vencimento: t.due || null,
         origem: 'task'
       });
     });
   });
 
-  return todas;
+  return { todas: todas, listas: listasInfo };
 }
 
 // ======================= GOOGLE CALENDAR =======================
@@ -99,8 +103,10 @@ function listarEventosHoje() {
 
 // ======================= AÇÃO: LISTAR =======================
 function listarPendentes() {
+  const tasksData = listarTasksPendentes();
   return {
-    tasks: listarTasksPendentes(),
+    tasks: tasksData.todas,
+    listas: tasksData.listas,
     eventos: listarEventosHoje()
   };
 }
@@ -111,7 +117,7 @@ function concluirItem(params) {
   const id = params.id;
   const listId = params.listId;
   const titulo = params.titulo || id;
-  const categoria = params.categoria || origem || 'geral';
+  const categoria = params.categoria || params.listaNome || (origem === 'evento' ? 'Eventos do Dia' : 'Geral');
 
   if (origem === 'task') {
     Tasks.Tasks.patch({ status: 'completed' }, listId, id);
@@ -196,11 +202,11 @@ function snapshotDiario() {
   const pendentes = listarPendentes();
 
   pendentes.tasks.forEach(function (t) {
-    registrarLog(t.titulo, 'task', 'não feito', 'task');
+    registrarLog(t.titulo, t.listaNome || 'Geral', 'não feito', 'task');
   });
 
   pendentes.eventos.forEach(function (ev) {
-    registrarLog(ev.titulo, 'evento', 'não feito', 'evento');
+    registrarLog(ev.titulo, 'Eventos do Dia', 'não feito', 'evento');
   });
 }
 
