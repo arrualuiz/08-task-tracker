@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Task Tracker</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Meu Painel de Tarefas</h1>
+    <nav>
+      <button data-tab="pendentes" class="tab-btn active">Pendentes</button>
+      <button data-tab="dashboard" class="tab-btn">Dashboard</button>
+    </nav>
+  </header>
+
+  <main>
+    <section id="pendentes" class="tab-content active">
+      <h2>Tasks</h2>
+      <ul id="lista-tasks" class="lista"></ul>
+
+      <h2>Eventos de hoje</h2>
+      <ul id="lista-eventos" class="lista"></ul>
+    </section>
+
+    <section id="dashboard" class="tab-content">
+      <div class="cards">
+        <div class="card">
+          <span id="taxa">--%</span>
+          <small>Taxa de cumprimento</small>
+        </div>
+        <div class="card">
+          <span id="feitos">--</span>
+          <small>Feitos</small>
+        </div>
+        <div class="card">
+          <span id="naofeitos">--</span>
+          <small>Não feitos</small>
+        </div>
+      </div>
+
+      <canvas id="grafico-dias" height="120"></canvas>
+      <canvas id="grafico-categorias" height="160"></canvas>
+    </section>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+  <script src="config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
