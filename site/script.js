@@ -1,10 +1,12 @@
 /**
  * TASK TRACKER — SCRIPT DO FRONTEND
- * Gerencia quadro Kanban estilo Google Tasks, sincronização e dashboard
+ * Gerencia quadro Kanban estilo Google Tasks, gestão de visibilidade de listas, sincronização e dashboard
  */
 
-// ======================= ESTADO GLOBAL =======================
+// ======================= CONSTANTES E ESTADO =======================
+const STORAGE_KEY_LISTAS = 'task_tracker_listas_visiveis';
 let dadosAtuais = { tasks: [], listas: [], eventos: [] };
+let listasVisiveis = carregarListasVisiveis();
 let graficoDiasInstance = null;
 let graficoCategoriasInstance = null;
 
@@ -18,6 +20,36 @@ const btnRecarregarDash = document.getElementById('btn-recarregar-dash');
 const inputFiltro = document.getElementById('input-filtro');
 const syncStatus = document.getElementById('sync-status');
 const toastContainer = document.getElementById('toast-container');
+
+// Elementos da Sidebar de Gestão de Listas
+const listsSidebar = document.getElementById('lists-sidebar');
+const btnToggleSidebar = document.getElementById('btn-toggle-sidebar');
+const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+const sidebarListsContainer = document.getElementById('sidebar-lists-container');
+const btnSelectAll = document.getElementById('btn-select-all');
+const btnDeselectAll = document.getElementById('btn-deselect-all');
+const activeListsCount = document.getElementById('active-lists-count');
+
+// ======================= PERSISTÊNCIA (LOCALSTORAGE) =======================
+function carregarListasVisiveis() {
+  try {
+    const salvo = localStorage.getItem(STORAGE_KEY_LISTAS);
+    if (salvo) {
+      return JSON.parse(salvo);
+    }
+  } catch (e) {
+    console.error('Erro ao ler localStorage', e);
+  }
+  return null; // null = padrão: todas ativas
+}
+
+function salvarListasVisiveis(arrayDeListas) {
+  try {
+    localStorage.setItem(STORAGE_KEY_LISTAS, JSON.stringify(arrayDeListas));
+  } catch (e) {
+    console.error('Erro ao salvar no localStorage', e);
+  }
+}
 
 // ======================= NAVEGAÇÃO ENTRE ABAS =======================
 tabs.forEach(btn => {
@@ -34,6 +66,16 @@ tabs.forEach(btn => {
     }
   });
 });
+
+// ======================= CONTROLE DA SIDEBAR DE LISTAS =======================
+function alternarSidebar() {
+  const estaFechada = listsSidebar.classList.toggle('collapsed');
+  btnToggleSidebar.classList.toggle('open', !estaFechada);
+  sidebarBackdrop.classList.toggle('active', !estaFechada);
+}
+
+btnToggleSidebar.addEventListener('click', alternarSidebar);
+sidebarBackdrop.addEventListener('click', alternarSidebar);
 
 // ======================= COMUNICAÇÃO COM API =======================
 async function chamarApi(action, extraParams = {}) {
@@ -110,7 +152,7 @@ function showToast(mensagem, tipo = 'success') {
   }, 3500);
 }
 
-// ======================= RENDERIZAÇÃO DO QUADRO KANBAN =======================
+// ======================= AGRUPAMENTO DE TAREFAS =======================
 function agruparTarefas(tasks, listasDefinidas) {
   const grupos = {};
 
@@ -149,15 +191,134 @@ function escolherCorAcento(titulo) {
   return '';
 }
 
+// ======================= GESTÃO DO PAINEL LATERAL DE LISTAS =======================
+function renderizarSidebarListas(grupos, totalEventos) {
+  sidebarListsContainer.innerHTML = '';
+  const todasListas = [];
+
+  // Se houver eventos de agenda, adiciona o item da agenda
+  if (totalEventos > 0) {
+    todasListas.push({
+      id: '__calendario__',
+      titulo: 'Eventos de Hoje (Agenda)',
+      count: totalEventos,
+      isCalendar: true
+    });
+  }
+
+  // Adiciona as listas do Google Tasks
+  Object.keys(grupos).forEach(nome => {
+    todasListas.push({
+      id: grupos[nome].id || nome,
+      titulo: nome,
+      count: grupos[nome].tarefas.length,
+      isCalendar: false
+    });
+  });
+
+  // Se o usuário nunca configurou listas visíveis, todas começam ativas por padrão
+  if (!listasVisiveis) {
+    listasVisiveis = todasListas.map(l => l.titulo);
+    salvarListasVisiveis(listasVisiveis);
+  }
+
+  let countAtivas = 0;
+
+  todasListas.forEach(item => {
+    const isAtiva = listasVisiveis.includes(item.titulo);
+    if (isAtiva) countAtivas++;
+
+    const div = document.createElement('div');
+    div.className = `sidebar-list-item ${isAtiva ? 'selected' : ''}`;
+    div.dataset.titulo = item.titulo;
+
+    div.innerHTML = `
+      <div class="custom-checkbox">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+      </div>
+      <span class="sidebar-list-name" title="${escapeHtml(item.titulo)}">${escapeHtml(item.titulo)}</span>
+      <span class="sidebar-list-badge">${item.count}</span>
+    `;
+
+    div.addEventListener('click', () => {
+      const index = listasVisiveis.indexOf(item.titulo);
+      if (index > -1) {
+        listasVisiveis.splice(index, 1);
+        div.classList.remove('selected');
+      } else {
+        listasVisiveis.push(item.titulo);
+        div.classList.add('selected');
+      }
+      salvarListasVisiveis(listasVisiveis);
+      atualizarVisibilidadeColunas();
+    });
+
+    sidebarListsContainer.appendChild(div);
+  });
+
+  atualizarBadgeContador();
+}
+
+function atualizarVisibilidadeColunas() {
+  let countAtivas = 0;
+  document.querySelectorAll('.board-column').forEach(col => {
+    const titulo = col.dataset.lista;
+    if (!listasVisiveis || listasVisiveis.includes(titulo)) {
+      col.classList.remove('hidden-by-filter');
+      countAtivas++;
+    } else {
+      col.classList.add('hidden-by-filter');
+    }
+  });
+
+  atualizarBadgeContador();
+}
+
+function atualizarBadgeContador() {
+  const total = document.querySelectorAll('.sidebar-list-item').length;
+  const ativas = listasVisiveis ? listasVisiveis.length : total;
+  activeListsCount.textContent = `${ativas}/${total}`;
+}
+
+// Botões de Seleção Rápida no Painel de Listas
+btnSelectAll.addEventListener('click', () => {
+  const itens = document.querySelectorAll('.sidebar-list-item');
+  listasVisiveis = [];
+  itens.forEach(it => {
+    listasVisiveis.push(it.dataset.titulo);
+    it.classList.add('selected');
+  });
+  salvarListasVisiveis(listasVisiveis);
+  atualizarVisibilidadeColunas();
+  showToast('Todas as listas foram ativadas no quadro.');
+});
+
+btnDeselectAll.addEventListener('click', () => {
+  listasVisiveis = [];
+  document.querySelectorAll('.sidebar-list-item').forEach(it => {
+    it.classList.remove('selected');
+  });
+  salvarListasVisiveis(listasVisiveis);
+  atualizarVisibilidadeColunas();
+  showToast('Todas as listas foram ocultadas. Marque as que deseja ver.');
+});
+
+// ======================= RENDERIZAÇÃO DO QUADRO KANBAN =======================
 function renderizarQuadro(data) {
   boardContainer.innerHTML = '';
   const grupos = agruparTarefas(data.tasks || [], data.listas || []);
-
-  // 1. Coluna especial de EVENTOS DO CALENDÁRIO (se existirem ou se o usuário quiser ver)
   const eventos = data.eventos || [];
+
+  // Renderiza a sidebar de controle de listas
+  renderizarSidebarListas(grupos, eventos.length);
+
+  // 1. Coluna especial de EVENTOS DO CALENDÁRIO
   if (eventos.length > 0) {
     const colEventos = document.createElement('div');
     colEventos.className = 'board-column';
+    colEventos.dataset.lista = 'Eventos de Hoje (Agenda)';
     colEventos.innerHTML = `
       <div class="column-header">
         <div class="column-title-group">
@@ -173,6 +334,7 @@ function renderizarQuadro(data) {
     eventos.forEach(ev => {
       const card = document.createElement('div');
       card.className = 'task-card';
+      card.dataset.titulo = (ev.titulo || '').toLowerCase();
       const horaStr = formatarHoraEvento(ev.inicio);
       card.innerHTML = `
         <button class="task-checkbox-btn" title="Marcar evento como concluído"
@@ -220,7 +382,6 @@ function renderizarQuadro(data) {
     const cardsContainer = col.querySelector('.column-cards');
 
     if (qtdTarefas === 0) {
-      // Estado de lista vazia / concluída
       cardsContainer.innerHTML = `
         <div class="column-empty">
           <div class="empty-icon-circle">
@@ -273,10 +434,13 @@ function renderizarQuadro(data) {
     boardContainer.appendChild(col);
   });
 
+  // Aplica o filtro de visibilidade salvo
+  atualizarVisibilidadeColunas();
+
   // Vincula eventos de clique nos checkboxes
   vincularBotoesConcluir();
 
-  // Aplica filtro se já houver texto digitado
+  // Aplica filtro de texto se houver
   if (inputFiltro.value.trim()) {
     aplicarFiltro(inputFiltro.value.trim());
   }
@@ -295,7 +459,6 @@ function vincularBotoesConcluir() {
       const listId = btn.dataset.listid || '';
       const listaNome = btn.dataset.listanome || btn.dataset.categoria || 'Geral';
 
-      // Feedback visual instantâneo
       card.classList.add('completing');
       btn.disabled = true;
 
@@ -309,7 +472,6 @@ function vincularBotoesConcluir() {
           listaNome: listaNome
         });
 
-        // Animação de saída suave
         card.style.transition = 'all 0.35s ease';
         card.style.maxHeight = `${card.offsetHeight}px`;
         requestAnimationFrame(() => {
@@ -326,7 +488,6 @@ function vincularBotoesConcluir() {
           const col = card.closest('.board-column');
           card.remove();
 
-          // Atualiza contador da coluna
           if (col) {
             const countBadge = col.querySelector('.column-count');
             const restantes = colCards ? colCards.querySelectorAll('.task-card').length : 0;
@@ -335,7 +496,6 @@ function vincularBotoesConcluir() {
               if (restantes === 0) countBadge.classList.add('zero');
             }
 
-            // Se esvaziou a coluna, exibe a mensagem de comemoração
             if (restantes === 0 && colCards) {
               colCards.innerHTML = `
                 <div class="column-empty">
@@ -363,7 +523,7 @@ function vincularBotoesConcluir() {
   });
 }
 
-// ======================= FILTRAGEM DE TAREFAS =======================
+// ======================= FILTRAGEM DE TAREFAS (BUSCA) =======================
 function aplicarFiltro(query) {
   const q = query.toLowerCase();
   document.querySelectorAll('.task-card').forEach(card => {
