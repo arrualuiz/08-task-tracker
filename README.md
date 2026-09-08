@@ -1,5 +1,9 @@
 # Task Tracker — Google Tasks/Calendar + Apps Script + Sheets + Site
 
+## Continuidade do projeto
+
+Veja o [mapa do projeto e plano de evolução](docs/MAPA-DO-PROJETO.md) para o estado real das funcionalidades, limites encontrados e primeira etapa para computador e Chrome no iPhone 11. O app Android em Kotlin fica para a segunda etapa. As orientações de comentários e manutenção estão em [AGENTS.md](AGENTS.md).
+
 Site próprio (Netlify/Vercel) que conclui tasks do Google Tasks, registra o
 que foi/não foi feito numa planilha do Google Sheets, e mostra um dashboard
 de cumprimento — tudo sem custo.

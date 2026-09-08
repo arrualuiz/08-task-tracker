@@ -113,6 +113,8 @@ function listarPendentes() {
 
 // ======================= AÇÃO: CONCLUIR =======================
 function concluirItem(params) {
+  // Tasks e Sheets são escritas independentes: se o log falhar após o patch,
+  // a tarefa já estará concluída. A evolução deve reconciliar por ID estável.
   const origem = params.origem;
   const id = params.id;
   const listId = params.listId;
@@ -199,6 +201,8 @@ function gerarDashboard() {
 // ======================= TRIGGER DIÁRIO =======================
 // Marca como "não feito" tudo que ainda estava pendente no fim do dia.
 function snapshotDiario() {
+  // Limitação atual: inclui tarefas futuras/sem data e eventos já logados.
+  // O planejamento deverá filtrar ocorrências aprovadas do dia e evitar duplicatas.
   const pendentes = listarPendentes();
 
   pendentes.tasks.forEach(function (t) {

@@ -79,6 +79,8 @@ sidebarBackdrop.addEventListener('click', alternarSidebar);
 
 // ======================= COMUNICAÇÃO COM API =======================
 async function chamarApi(action, extraParams = {}) {
+  // Todas as ações atuais usam GET, inclusive conclusão. Na evolução da API,
+  // separar consultas de alterações e substituir o token exposto no navegador.
   const params = new URLSearchParams({
     action: action,
     token: CONFIG.TOKEN,
@@ -154,6 +156,8 @@ function showToast(mensagem, tipo = 'success') {
 
 // ======================= AGRUPAMENTO DE TAREFAS =======================
 function agruparTarefas(tasks, listasDefinidas) {
+  // Limitação atual: o título é a chave; listas homônimas podem se misturar.
+  // Ao evoluir o planejamento, usar listId também nas preferências de exibição.
   const grupos = {};
 
   // Se a API retornou a lista oficial de listas, inicializa todas (mesmo as vazias)
@@ -448,6 +452,8 @@ function renderizarQuadro(data) {
 
 // ======================= CONCLUIR TAREFA =======================
 function vincularBotoesConcluir() {
+  // Este checkbox significa execução concluída, não aprovação para fazer.
+  // Para eventos, a API atual só registra no Sheets; não modifica o Calendar.
   document.querySelectorAll('.task-checkbox-btn').forEach(btn => {
     btn.addEventListener('click', async () => {
       const card = btn.closest('.task-card');
