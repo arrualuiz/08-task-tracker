@@ -10,3 +10,5 @@
 - Validar mudanças locais sem criar, concluir ou excluir tarefas reais como teste automático.
 - Primeira etapa com várias contas do mesmo usuário: visão conjunta e filtros por conta, mantendo identidade e autorização separadas. Alexa fica com uma conta a definir e integração ainda a investigar.
 - O calendário ICS recebido é a base inicial de rotinas. Preservar regras e exceções e manter inventários pessoais em dados-locais/, fora do Git e da pasta pública site/.
+- Fazer commits por entrega funcional e informar os hashes ao usuário. Registrar alterações em CHANGELOG.md. Push ao remoto não faz parte do fluxo automático.
+- A fonte de verdade das revisões é dados-locais/task-tracker.sqlite. Usar a API local para editar; não sobrescrever o banco com o inventário antigo. Histórico e edição devem ser gravados atomicamente.

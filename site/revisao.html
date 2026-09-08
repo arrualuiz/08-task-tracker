@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Revisão de rotinas · Task Tracker</title>
+  <link rel="stylesheet" href="/revisao.css"><script src="/revisao.js" defer></script>
+</head>
+<body>
+  <!-- A revisão é a atividade principal; situação local permanece sempre visível. -->
+  <header><div class="brand"><span class="logo">✓</span><strong>Task Tracker</strong><span class="tag">LOCAL</span></div><a href="/api/export" download>Exportar backup ↗</a></header>
+  <main>
+    <div class="intro"><div><p class="eyebrow">SEU PLANEJAMENTO</p><h1>Revisão de rotinas</h1><p>Organize a rotina que você já tem. Uma mudança de cada vez.</p></div><div class="local-note"><span class="dot"></span> Salvo neste computador<br><small>Google ainda não conectado</small></div></div>
+    <section class="stats" aria-label="Resumo"><div><span id="total">—</span> rotinas importadas</div><div><span id="pending">—</span> para revisar</div><div><span id="approved">—</span> aprovadas</div><div><span id="paused">—</span> pausadas</div></section>
+    <div id="notice" role="status" aria-live="polite"></div>
+    <section class="workspace">
+      <aside class="catalog" aria-label="Lista de rotinas">
+        <div class="filters"><label>Buscar rotina<input id="search" type="search" placeholder="Ex.: Duolingo, roupas, moto"></label><div class="filter-pair"><label>Categoria<select id="category-filter"><option value="">Todas</option></select></label><label>Situação<select id="status-filter"><option value="">Todas</option><option value="pending">Para revisar</option><option value="approved">Aprovadas</option><option value="paused">Pausadas</option></select></label></div><label>Conta de destino<select id="account-filter"><option value="">Todas as contas</option></select></label></div>
+        <div class="list-heading"><span id="results">Carregando…</span><button id="reload" type="button" class="quiet">Atualizar</button></div><div id="routine-list" class="routine-list"></div>
+      </aside>
+      <section class="editor" aria-label="Editar rotina"><div id="empty">Carregando suas rotinas…</div>
+        <form id="edit-form" hidden>
+          <div class="editor-heading"><span id="kind-label" class="eyebrow"></span><span id="version" class="tag"></span></div><h2 id="editor-title"></h2>
+          <div id="warnings" class="warnings"></div>
+          <label>Título<input name="title" required maxlength="300"></label>
+          <div class="pair"><label>Categoria<input name="category" list="categories" required maxlength="300"></label><label>Conta de destino<input name="account" list="accounts" required maxlength="300"></label></div><datalist id="categories"></datalist><datalist id="accounts"></datalist><p class="hint">O nome da conta organiza a revisão. A vinculação ao Google será feita depois.</p>
+          <div class="pair"><label>Tipo de item<select name="kind"><option value="task">Tarefa para fazer</option><option value="appointment">Compromisso com horário</option><option value="info">Informação / disponibilidade</option></select></label><label>Situação da revisão<select name="status"><option value="pending">Para revisar</option><option value="approved">Aprovada para o planejamento</option><option value="paused">Pausada</option></select></label></div>
+          <!-- Aprovação pertence à rotina; execução diária será uma entidade separada. -->
+          <p class="hint">Aprovar prepara a rotina para o planejamento. Não marca como concluída nem cria eventos no Google.</p>
+          <fieldset><legend>Quando acontece</legend><div class="triple"><label>Data inicial<input name="date" type="date" required></label><label>Horário (opcional)<input name="time" type="time"></label><label>Duração em minutos<input name="duration" type="number" min="0" max="10080" required></label></div><p class="hint">Duração 0 significa duração não definida.</p>
+          <label>Repetir<select name="frequency"><option value="ONCE">Não repetir</option><option value="DAILY">Todos os dias</option><option value="WEEKLY">Em dias da semana</option><option value="MONTHLY">Mensalmente</option></select></label>
+          <div id="weekly" class="weekdays" aria-label="Dias da semana"></div>
+          <div id="monthly" hidden><label>Regra mensal<select name="monthlyMode"><option value="date">Em um dia do mês</option><option value="weekday">Em uma semana do mês</option></select></label><label id="month-date">Dia do mês<input name="monthDay" type="number" min="1" max="31"></label><div id="month-week" class="pair"><label>Semana<select name="ordinal"><option value="1">Primeira</option><option value="2">Segunda</option><option value="3">Terceira</option><option value="4">Quarta</option><option value="5">Quinta</option></select></label><label>Dia<select name="weekday"></select></label></div><p class="hint">Dias 29–31 e quinta semana só acontecem nos meses em que existem.</p></div>
+          <p class="hint">Editar dias ou horários revisa a série inteira. Exceções do calendário original ficam preservadas para a futura sincronização.</p></fieldset>
+          <label>Observações da revisão<textarea name="notes" rows="3" maxlength="5000" placeholder="O que mudar, por quê, ou o que falta decidir…"></textarea></label>
+          <div class="save-bar"><span id="save-state">Sem alterações</span><button id="discard" type="button" class="quiet">Descartar edição</button><button id="save" type="submit">Salvar alterações</button></div>
+          <details><summary>Origem e exceções do calendário</summary><pre id="source"></pre></details>
+          <details id="history-section" open><summary>Histórico desta rotina</summary><div id="history"></div></details>
+        </form>
+      </section>
+    </section>
+  </main>
+</body></html>

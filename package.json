@@ -1,0 +1,11 @@
+{
+  "name": "task-tracker-local",
+  "private": true,
+  "version": "0.1.0",
+  "engines": { "node": ">=24.0.0" },
+  "scripts": {
+    "start": "node local/server.cjs",
+    "test": "node --test local/store.test.cjs",
+    "check": "node --check local/server.cjs && node --check local/store.cjs && node --check site/revisao.js"
+  }
+}

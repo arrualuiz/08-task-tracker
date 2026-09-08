@@ -2,6 +2,8 @@
 
 ## Continuidade do projeto
 
+**Página de revisão local:** execute `npm start` com Node.js 24+ e abra http://localhost:3210. A revisão usa dados reais importados do ICS e salva no banco local. Veja [execução, fonte de verdade e backups](docs/REVISAO-LOCAL.md) e o [histórico de entregas](CHANGELOG.md). A integração Apps Script descrita abaixo é o quadro anterior e não é necessária para a revisão local.
+
 Veja o [mapa do projeto e plano de evolução](docs/MAPA-DO-PROJETO.md) para o estado real das funcionalidades, limites encontrados e primeira etapa para computador e Chrome no iPhone 11. O app Android em Kotlin fica para a segunda etapa. As orientações de comentários e manutenção estão em [AGENTS.md](AGENTS.md).
 
 Site próprio (Netlify/Vercel) que conclui tasks do Google Tasks, registra o

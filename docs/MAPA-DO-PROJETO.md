@@ -9,6 +9,14 @@ Criar e acompanhar tarefas no computador e no Chrome do iPhone 11, sem instalar 
 
 ## O que existe no código
 
+### Entrega atual: revisão local persistente
+
+A página de revisão está em `site/revisao.html`, `revisao.css` e `revisao.js`. `npm start` inicia `local/server.cjs` em http://localhost:3210. `local/store.cjs` importa os 111 registros principais uma única vez e mantém `dados-locais/task-tracker.sqlite` como fonte de verdade. A exceção fica anexada à série correspondente.
+
+É possível editar as rotinas reais, frequência, dias, data inicial, horário, categoria, nome da conta de destino, tipo, aprovação e observações. Cada edição tem histórico e controle de versão. A página oferece busca, filtros e exportação de backup JSON. [Detalhes de operação](REVISAO-LOCAL.md).
+
+Esta entrega usa SQLite local e não o Apps Script para as revisões. Os dados do Google não são alterados. O rótulo de conta ainda não conecta credenciais; aprovação não gera ocorrências ou tarefas. As seções abaixo sobre o quadro Apps Script descrevem o comportamento anterior, preservado no código.
+
 ### Base inicial de rotinas e várias contas
 
 O usuário quer manter rotinas em uma conta e tarefas avulsas em outra, com visão das duas no site e celular, identificadas e filtráveis por conta. Cada tarefa deve ser alterada na sua conta de origem. A integração Alexa deve usar uma conta escolhida; sua viabilidade específica ainda será investigada.
@@ -21,7 +29,7 @@ Revisar antes de ativar: 47 eventos principais com duração zero, dez séries d
 
 O modelo de dados deverá incluir `accountId` e `calendarId` na origem, além de `UID` do ICS e identidade da ocorrência. O UID exportado não deve ser usado diretamente como eventId da API. A autorização da conta ainda precisa ser conectada; possuir o ICS não concede acesso à agenda.
 
-Próxima entrega funcional: revisão das rotinas por conta/categoria e seleção Fazer por ocorrência, usando este inventário como entrada. Manter Concluída como ação separada e preservar o histórico entre os dias.
+Revisão de rotinas por conta/categoria entregue localmente, com aprovação da série. Próxima entrega: gerar ocorrências para o planejamento diário e seleção Fazer por ocorrência. Manter Concluída como ação separada e preservar o histórico entre os dias.
 
 | Arquivo | Responsabilidade e estado atual |
 | --- | --- |
@@ -33,7 +41,7 @@ Próxima entrega funcional: revisão das rotinas por conta/categoria e seleção
 | `apps-script/appsscript.json` | Runtime V8, fuso America/Sao_Paulo, serviço avançado Tasks e permissões. Calendar tem somente leitura. |
 | `README.md` | Instruções manuais de configuração e publicação. Não comprovam que exista uma implantação funcionando. |
 
-O projeto é HTML/CSS/JavaScript e Google Apps Script. Não há app Kotlin, backend local, build, suíte de testes, manifest PWA ou service worker neste checkout.
+O quadro original é HTML/CSS/JavaScript e Google Apps Script. A revisão acrescenta backend Node.js/SQLite e testes locais. Não há app Kotlin, etapa de build, manifest PWA ou service worker neste checkout.
 
 ## Fluxo atual
 
