@@ -3,11 +3,12 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Revisão de rotinas · Task Tracker</title>
-  <link rel="stylesheet" href="/revisao.css"><script src="/revisao.js" defer></script>
+  <link rel="stylesheet" href="/revisao.css"><link rel="stylesheet" href="/calendarios.css"><script src="/revisao.js" defer></script>
 </head>
 <body>
   <!-- A revisão é a atividade principal; situação local permanece sempre visível. -->
   <header><div class="brand"><span class="logo">✓</span><strong>Task Tracker</strong><span class="tag">LOCAL</span></div><a href="/api/export" download>Exportar backup ↗</a></header>
+  <nav class="app-tabs" aria-label="Funções do site"><a href="/">Meu dia</a><a href="/calendarios">Calendários</a><a href="/revisao" aria-current="page">Revisão de rotinas</a></nav>
   <main>
     <a href="/">← Voltar para meu dia</a><div class="intro"><div><p class="eyebrow">SUAS ROTINAS</p><h1>Revisão de rotinas</h1><p>Organize a rotina que você já tem. Uma mudança de cada vez.</p></div><div class="local-note"><span class="dot"></span> Salvo neste computador<br><small>Google ainda não conectado</small></div></div>
     <section class="stats" aria-label="Resumo"><div><span id="total">—</span> rotinas importadas</div><div><span id="pending">—</span> para revisar</div><div><span id="approved">—</span> aprovadas</div><div><span id="paused">—</span> pausadas</div></section>

@@ -1,5 +1,15 @@
 # Histórico do projeto
 
+## 2026-09-11 — Calendários e autorização Google por conta
+
+- Navegação entre Meu dia, Calendários e Revisão de rotinas.
+- Página de consulta de eventos por período, calendário e conta, com busca e identificação da origem.
+- Configuração guiada do cliente OAuth e autorização de leitura separada para cada conta Google.
+- Credenciais privadas fora do Git, pasta pública e backups; estado/cookie OAuth de uso único e renovação no servidor.
+- Paginação, recorrências expandidas pelo Google, eventos de dia inteiro, exceções e avisos de falha parcial.
+- Desconexão local sem excluir eventos; planejamento diário e revisões preservados.
+- Onze testes isolados aprovados. Conexão real pendente de configuração e consentimento do usuário; sem publicação ou push.
+
 ## 2026-09-10 — Meu dia: planejamento por blocos
 
 - Nova tela principal com data, sugestões filtráveis por conta e busca, priorizando rotinas aprovadas.

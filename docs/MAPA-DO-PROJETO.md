@@ -9,7 +9,17 @@ Criar e acompanhar tarefas no computador e no Chrome do iPhone 11, sem instalar 
 
 ## O que existe no código
 
-### Entrega atual: planejamento do dia (10/09/2026)
+### Entrega atual: aba Calendários e conexão Google (11/09/2026)
+
+Navegação por função: **Meu dia**, **Calendários** (`/calendarios`) e **Revisão de rotinas**. A página de calendários tem instruções de configuração do projeto Google, envio local do JSON do cliente OAuth, conexão/desconexão por conta, lista de calendários, seleção e consulta de eventos por período (até 31 dias e 20 calendários), filtro de conta e busca nos eventos carregados.
+
+`local/calendars.cjs` implementa OAuth de leitura com estado vinculado ao navegador, validade/uso único, PKCE e renovação dos tokens no servidor. A identidade é `sub` da conta Google; eventos usam conta + ID do calendário + ID do evento, preservando referência à série e início original das exceções. A API Google expande recorrências, a paginação é percorrida e falhas parciais aparecem explicitamente. A nova integração não usa a credencial fixa do Apps Script anterior.
+
+Credenciais ficam em `dados-locais/google-private.sqlite`, separado do banco de revisões e excluído de backups exportados, Git e arquivos públicos. Desconectar remove somente a autorização local; não exclui eventos. Os eventos consultados não são persistidos nem enviados ao planejamento automaticamente.
+
+**Implementado e validado com simulação:** fluxo OAuth, leitura, isolamento de contas/credenciais e UI de configuração. **Pendente de ação do usuário:** configurar o projeto OAuth e consentir no Google para validar a conexão real. Onze testes isolados aprovados; nenhum evento real foi usado como teste. O site permanece local. iPhone remoto, iCloud, escrita Google, sincronização e hospedagem ainda são etapas futuras. [Guia de integração](INTEGRACAO-GOOGLE-CALENDAR.md).
+
+### Planejamento do dia (10/09/2026)
 
 A página inicial agora é `site/dia.html`, com `dia.js` e `dia.css`. Permite escolher uma data, adicionar tarefas livres ou sugestões das rotinas, editar comentários, horário opcional e duração, remover do dia, concluir/reabrir e ordenar por arraste ou setas. Os grupos são manhã, tarde, noite e sem bloco definido; cada item pode mudar de grupo pelo seletor. Reservas de tempo exigem início e duração e avisam sobre sobreposição. Reservar significa blocar tempo no planejamento local, não criar um evento Google.
 
@@ -25,7 +35,7 @@ A página de revisão está em `site/revisao.html`, `revisao.css` e `revisao.js`
 
 É possível editar as rotinas reais, frequência, dias, data inicial, horário, categoria, nome da conta de destino, tipo, aprovação e observações. Cada edição tem histórico e controle de versão. A página oferece busca, filtros e exportação de backup JSON. [Detalhes de operação](REVISAO-LOCAL.md).
 
-Esta entrega usa SQLite local e não o Apps Script para as revisões. Os dados do Google não são alterados. O rótulo de conta ainda não conecta credenciais; aprovação não gera ocorrências ou tarefas. As seções abaixo sobre o quadro Apps Script descrevem o comportamento anterior, preservado no código.
+Esta entrega usa SQLite local e não o Apps Script para as revisões. Os dados do Google não são alterados. O rótulo de conta da revisão ainda não se vincula às contas OAuth da aba Calendários; aprovação não gera ocorrências ou tarefas. As seções abaixo sobre o quadro Apps Script descrevem o comportamento anterior, preservado no código.
 
 ### Base inicial de rotinas e várias contas
 

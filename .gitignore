@@ -6,3 +6,8 @@ site/config.js
 
 # Exportações pessoais e inventários locais não fazem parte do site publicado.
 dados-locais/
+
+# Arquivos de autorização Google eventualmente baixados na raiz nunca devem ser commitados.
+client_secret_*.json
+credentials.json
+token.json
