@@ -55,3 +55,22 @@ A conexão real depende das credenciais e do consentimento do usuário e deve se
 - [Lista de calendários](https://developers.google.com/workspace/calendar/api/v3/reference/calendarList/list): escopo de leitura e paginação.
 - [Lista de eventos](https://developers.google.com/workspace/calendar/api/v3/reference/events/list): período, recorrências expandidas e paginação.
 - [Expiração de tokens em projetos de teste](https://developers.google.com/identity/protocols/oauth2#expiration): limites de autorizações no estado Testing.
+
+
+## Google Tasks — leitura por conta e lista
+
+A aba **Google Tasks**, em http://localhost:3210/tarefas, exibe listas e tarefas das contas autorizadas. A configuração OAuth existente é reaproveitada; não é preciso baixar outro JSON.
+
+1. Ative a [Google Tasks API no mesmo projeto](https://console.cloud.google.com/apis/library/tasks.googleapis.com?project=task-tracker-508303).
+2. Clique em **Autorizar Google Tasks** na nova aba e escolha a conta. Essa ação pede o escopo adicional `https://www.googleapis.com/auth/tasks.readonly`, além da leitura de calendários já utilizada.
+3. Autorize a leitura, selecione as listas e clique em **Consultar tarefas**. Repita a autorização para cada conta desejada.
+
+Contas antigas continuam consultando calendários; Tasks fica identificado como pendente até receber autorização. Recusar a nova permissão não substitui a conexão existente. O identificador da conta permanece o mesmo após a autorização, sem duplicação. O servidor registra os escopos concedidos, sem devolvê-los junto com tokens ao navegador.
+
+A consulta aceita até 200 listas, percorre páginas e mantém no máximo cinco fontes simultâneas por solicitação. Há filtros por conta, situação (pendentes, concluídas ou todas) e busca em títulos/notas. Tarefas sem data são incluídas. A data `due` representa o dia agendado: a API não disponibiliza o horário da tarefa. Notas, referência à tarefa pai e estado concluído são preservados; nenhum controle de seleção altera o estado no Google.
+
+Concluídas incluem as ocultas pelos clientes Google, com `showHidden`; tarefas atribuídas por Docs/Chat são solicitadas com `showAssigned`. Excluídas são omitidas. Falhas de uma conta/lista são apresentadas como consulta incompleta. IDs de conta, lista e tarefa compõem a identidade; título não é chave. Os resultados ficam em memória, sem cópia persistente, inclusão automática em Meu dia ou operações de escrita.
+
+Testes simulados cobrem o novo escopo, conta antiga, reconexão sem duplicação, paginação, datas sem deslocamento de fuso, subtarefas, duplicatas e falhas parciais. A validação com Tasks real depende da ativação da API e do consentimento do usuário.
+
+Referências: [Listas de tarefas](https://developers.google.com/workspace/tasks/reference/rest/v1/tasklists/list), [consulta de tarefas](https://developers.google.com/workspace/tasks/reference/rest/v1/tasks/list) e [campos da tarefa](https://developers.google.com/workspace/tasks/reference/rest/v1/tasks).

@@ -17,25 +17,25 @@ function createServer(store, calendars = null) {
       const url = new URL(req.url, `http://${req.headers.host}`);
       // Mesmo endereço de retorno da configuração; nunca aceita um host fornecido sem validação.
       const origin = `http://${req.headers.host}`;
-      if (url.pathname.startsWith('/api/calendars') || url.pathname === '/oauth/google/callback') {
+      if (url.pathname.startsWith('/api/calendars') || url.pathname.startsWith('/api/tasks/') || url.pathname === '/oauth/google/callback') {
         if (!calendars) return json(503, { error: 'Integração de calendários indisponível neste servidor.' });
         const body = async () => {
           if (!req.headers['content-type']?.startsWith('application/json')) throw Object.assign(new Error('Envie JSON.'), { status: 415 });
           let raw = '';
-          for await (const chunk of req) { raw += chunk; if (Buffer.byteLength(raw) > 100000) throw Object.assign(new Error('Arquivo ou consulta muito grande.'), { status: 413 }); }
+          for await (const chunk of req) { raw += chunk; if (Buffer.byteLength(raw) > 500000) throw Object.assign(new Error('Arquivo ou consulta muito grande.'), { status: 413 }); }
           try { return JSON.parse(raw); } catch { throw Object.assign(new Error('JSON inválido.'), { status: 400 }); }
         };
         if (req.method === 'GET' && url.pathname === '/api/calendars/status') return json(200, calendars.status(origin));
         if (req.method === 'POST' && url.pathname === '/api/calendars/config') return json(200, calendars.configure(await body(), origin));
         if (req.method === 'POST' && url.pathname === '/api/calendars/connect') {
-          await body(); const attempt = calendars.begin(origin);
+          const input = await body(); const attempt = calendars.begin(origin, { includeTasks: input?.includeTasks === true });
           res.setHeader('Set-Cookie', `calendar_oauth=${attempt.state}; HttpOnly; SameSite=Lax; Path=/oauth/google/callback; Max-Age=600`);
           return json(200, { url: attempt.url });
         }
         if (req.method === 'GET' && url.pathname === '/oauth/google/callback') {
           const cookie = (req.headers.cookie || '').split(';').map(v => v.trim()).find(v => v.startsWith('calendar_oauth='))?.slice('calendar_oauth='.length);
           let location = '/calendarios?connection=success';
-          try { await calendars.finish(url.searchParams, cookie, origin); }
+          try { const result = await calendars.finish(url.searchParams, cookie, origin); location = `${result.returnPath}?connection=success`; }
           catch (error) { location = `/calendarios?connection=error&reason=${encodeURIComponent(error.status ? error.message : 'Não foi possível concluir a conexão. Tente novamente.')}`; }
           // Remove código e estado da barra de endereço e impede envio deles como Referer.
           res.writeHead(303, { Location: location, 'Cache-Control': 'no-store', 'Referrer-Policy': 'no-referrer', 'Set-Cookie': 'calendar_oauth=; HttpOnly; SameSite=Lax; Path=/oauth/google/callback; Max-Age=0' });
@@ -43,6 +43,8 @@ function createServer(store, calendars = null) {
         }
         if (req.method === 'POST' && url.pathname === '/api/calendars/disconnect') { const input = await body(); return json(200, calendars.disconnect(input?.accountId)); }
         if (req.method === 'GET' && url.pathname === '/api/calendars/list') return json(200, await calendars.list());
+        if (req.method === 'GET' && url.pathname === '/api/tasks/lists') return json(200, await calendars.tasks.lists());
+        if (req.method === 'POST' && url.pathname === '/api/tasks/list') return json(200, await calendars.tasks.list(await body()));
         if (req.method === 'POST' && url.pathname === '/api/calendars/events') return json(200, await calendars.events(await body()));
       }
       const planMatch = /^\/api\/days\/(\d{4}-\d{2}-\d{2})(\/history)?$/.exec(url.pathname);
@@ -73,7 +75,7 @@ function createServer(store, calendars = null) {
         try { input = JSON.parse(body); } catch { return json(400, { error: 'JSON inválido.' }); }
         return json(200, { routine: store.update(match[1], input) });
       }
-      const files = { '/': ['dia.html', 'text/html'], '/dia.js': ['dia.js', 'text/javascript'], '/dia.css': ['dia.css', 'text/css'], '/calendarios': ['calendarios.html', 'text/html'], '/calendarios.js': ['calendarios.js', 'text/javascript'], '/calendarios.css': ['calendarios.css', 'text/css'], '/revisao': ['revisao.html', 'text/html'], '/revisao.js': ['revisao.js', 'text/javascript'], '/revisao.css': ['revisao.css', 'text/css'] };
+      const files = { '/': ['dia.html', 'text/html'], '/dia.js': ['dia.js', 'text/javascript'], '/dia.css': ['dia.css', 'text/css'], '/tarefas': ['tarefas.html', 'text/html'], '/tarefas.js': ['tarefas.js', 'text/javascript'], '/calendarios': ['calendarios.html', 'text/html'], '/calendarios.js': ['calendarios.js', 'text/javascript'], '/calendarios.css': ['calendarios.css', 'text/css'], '/revisao': ['revisao.html', 'text/html'], '/revisao.js': ['revisao.js', 'text/javascript'], '/revisao.css': ['revisao.css', 'text/css'] };
       if (req.method === 'GET' && files[url.pathname]) {
         const [file, mime] = files[url.pathname];
         res.writeHead(200, { 'Content-Type': `${mime}; charset=utf-8`, 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff', 'Content-Security-Policy': "default-src 'self'; style-src 'self'; script-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'" });

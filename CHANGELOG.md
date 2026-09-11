@@ -1,5 +1,14 @@
 # Histórico do projeto
 
+## 2026-09-11 — Mais calendários e consulta Google Tasks
+
+- Limite ampliado de 20 para 200 calendários, seleção em lote e até cinco fontes simultâneas por consulta.
+- Nova aba Google Tasks com listas por conta, filtros de situação, busca, notas, datas e subtarefas.
+- Autorização adicional de leitura Tasks por conta, reaproveitando o JSON e preservando as conexões existentes.
+- Paginação, deduplicação por IDs e avisos de falhas parciais.
+- Quatorze testes simulados aprovados; nenhuma tarefa real criada, concluída ou excluída.
+- Uso real de Tasks depende da ativação da API e consentimento do usuário. Sem push.
+
 ## 2026-09-11 — Calendários e autorização Google por conta
 
 - Navegação entre Meu dia, Calendários e Revisão de rotinas.

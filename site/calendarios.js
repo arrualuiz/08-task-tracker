@@ -10,7 +10,7 @@ async function api(url, body) {
 }
 function lock(value) {
   busy = value;
-  for (const id of ['events-form', 'calendar-list', 'accounts', 'config-form']) $(id).inert = value;
+  for (const id of ['events-form', 'calendar-list', 'accounts', 'config-form', 'calendar-selection']) $(id).inert = value;
   $('connect').disabled = value || !connection?.configured;
   $('refresh-calendars').disabled = value || !connection?.accounts.length;
   $('load-events').disabled = value || !calendars.length;
@@ -41,7 +41,9 @@ function renderAccounts() {
   if (connection.accounts.some(a => a.id === previous)) $('account-filter').value = previous;
   if (!connection.accounts.length) $('accounts').append(el('p', 'Nenhuma conta conectada.'));
 }
+function selectionCount() { $('selected-count').textContent = `${selected.size} calendário(s) selecionado(s)`; }
 function renderCalendars() {
+  selectionCount();
   $('calendar-list').replaceChildren();
   for (const a of connection.accounts) {
     const values = calendars.filter(c => c.accountId === a.id); if (!values.length) continue;
@@ -49,7 +51,7 @@ function renderCalendars() {
     for (const c of values) {
       const label = el('label', '', 'calendar-choice'), checkbox = document.createElement('input'), text = el('span', c.title);
       checkbox.type = 'checkbox'; checkbox.checked = selected.has(key(c));
-      checkbox.onchange = () => { if (checkbox.checked) selected.add(key(c)); else selected.delete(key(c)); stale(); };
+      checkbox.onchange = () => { if (checkbox.checked) selected.add(key(c)); else selected.delete(key(c)); selectionCount(); stale(); };
       text.append(el('small', `${c.primary ? 'Principal · ' : ''}${c.accessRole === 'freeBusyReader' ? 'Somente disponibilidade' : 'Leitura autorizada'}`));
       label.append(checkbox, text); $('calendar-list').append(label);
     }
@@ -141,6 +143,13 @@ $('events-form').onsubmit = async event => {
   } catch (error) { notice('events-notice', error.message, true); empty('Consulta não realizada', 'Corrija o período ou a conexão e tente novamente.'); }
   finally { lock(false); }
 };
+$('select-all').onclick = () => {
+  const values = calendars.filter(c => !$('account-filter').value || c.accountId === $('account-filter').value);
+  const next = new Set([...selected, ...values.map(key)]);
+  if (next.size > (connection?.maxCalendars || 200)) { notice('events-notice', 'Selecione até 200 calendários por consulta.', true); return; }
+  selected = next; renderCalendars(); stale();
+};
+$('select-none').onclick = () => { selected.clear(); renderCalendars(); stale(); };
 $('event-search').oninput = () => { if (events.length) renderEvents(); };
 for (const id of ['from', 'to', 'account-filter']) $(id).onchange = stale;
 async function init() {

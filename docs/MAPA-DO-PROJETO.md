@@ -9,9 +9,19 @@ Criar e acompanhar tarefas no computador e no Chrome do iPhone 11, sem instalar 
 
 ## O que existe no código
 
-### Entrega atual: aba Calendários e conexão Google (11/09/2026)
+### Entrega atual: 200 calendários e Google Tasks (11/09/2026)
 
-Navegação por função: **Meu dia**, **Calendários** (`/calendarios`) e **Revisão de rotinas**. A página de calendários tem instruções de configuração do projeto Google, envio local do JSON do cliente OAuth, conexão/desconexão por conta, lista de calendários, seleção e consulta de eventos por período (até 31 dias e 20 calendários), filtro de conta e busca nos eventos carregados.
+O limite passou de 20 para **200 calendários por consulta**, com seleção em lote e até cinco fontes simultâneas. A paginação e os avisos de consulta incompleta são preservados.
+
+A aba **Google Tasks** (`/tarefas`) consulta listas e tarefas depois da ativação da API e autorização adicional por conta. Há filtros de conta, seleção de até 200 listas, situação e busca, com notas, datas, tarefas sem data e referência à tarefa pai. A identidade usa conta + lista + tarefa. Selecionar uma lista não conclui tarefas; não há escrita no Google nem inclusão automática no Meu dia.
+
+`local/google-tasks.cjs` reutiliza autenticação/paginação do módulo Google. Os escopos concedidos são registrados no banco privado existente. Contas antigas mantêm calendários funcionando e precisam autorizar `tasks.readonly` para ver Tasks. A reconexão não duplica a conta.
+
+Quatorze testes isolados aprovados, incluindo consulta de 200 calendários, concorrência limitada, permissões, paginação, datas e falhas parciais. Duas contas locais já estão conectadas ao Calendar; ambas ainda precisam autorizar Tasks. Nenhuma tarefa real foi modificada como teste. O site permanece local e não houve push. [Configuração e limites](INTEGRACAO-GOOGLE-CALENDAR.md).
+
+### Aba Calendários e conexão Google (11/09/2026)
+
+Navegação por função: **Meu dia**, **Calendários** (`/calendarios`), **Google Tasks** e **Revisão de rotinas**. A página de calendários tem instruções de configuração do projeto Google, envio local do JSON do cliente OAuth, conexão/desconexão por conta, lista de calendários, seleção e consulta de eventos por período (até 31 dias e, após a ampliação, 200 calendários), filtro de conta e busca nos eventos carregados.
 
 `local/calendars.cjs` implementa OAuth de leitura com estado vinculado ao navegador, validade/uso único, PKCE e renovação dos tokens no servidor. A identidade é `sub` da conta Google; eventos usam conta + ID do calendário + ID do evento, preservando referência à série e início original das exceções. A API Google expande recorrências, a paginação é percorrida e falhas parciais aparecem explicitamente. A nova integração não usa a credencial fixa do Apps Script anterior.
 
