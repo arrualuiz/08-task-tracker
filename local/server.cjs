@@ -15,6 +15,16 @@ function createServer(store) {
       if (!hosts.includes(req.headers.host)) return json(403, { error: 'Host não permitido.' });
       if (req.headers.origin && !hosts.map(h => `http://${h}`).includes(req.headers.origin)) return json(403, { error: 'Origem não permitida.' });
       const url = new URL(req.url, `http://${req.headers.host}`);
+      const planMatch = /^\/api\/days\/(\d{4}-\d{2}-\d{2})(\/history)?$/.exec(url.pathname);
+      if (planMatch && req.method === 'GET') return json(200, planMatch[2] ? {history:store.planning.history(planMatch[1])} : store.planning.get(planMatch[1]));
+      if (planMatch && !planMatch[2] && req.method === 'PUT') {
+        if (!req.headers['content-type']?.startsWith('application/json')) return json(415, {error:'Envie JSON.'});
+        let body = '';
+        for await (const chunk of req) { body += chunk; if (Buffer.byteLength(body) > 2000000) return json(413, {error:'Planejamento muito grande.'}); }
+        let input;
+        try { input = JSON.parse(body); } catch { return json(400, {error:'JSON inválido.'}); }
+        return json(200, store.planning.save(planMatch[1], input));
+      }
       if (req.method === 'GET' && url.pathname === '/api/routines') return json(200, { routines: store.list() });
       if (req.method === 'GET' && url.pathname === '/api/export') {
         res.setHeader('Content-Disposition', 'attachment; filename="task-tracker-backup.json"');
@@ -33,7 +43,7 @@ function createServer(store) {
         try { input = JSON.parse(body); } catch { return json(400, { error: 'JSON inválido.' }); }
         return json(200, { routine: store.update(match[1], input) });
       }
-      const files = { '/': ['revisao.html', 'text/html'], '/revisao': ['revisao.html', 'text/html'], '/revisao.js': ['revisao.js', 'text/javascript'], '/revisao.css': ['revisao.css', 'text/css'] };
+      const files = { '/': ['dia.html', 'text/html'], '/dia.js': ['dia.js', 'text/javascript'], '/dia.css': ['dia.css', 'text/css'], '/revisao': ['revisao.html', 'text/html'], '/revisao.js': ['revisao.js', 'text/javascript'], '/revisao.css': ['revisao.css', 'text/css'] };
       if (req.method === 'GET' && files[url.pathname]) {
         const [file, mime] = files[url.pathname];
         res.writeHead(200, { 'Content-Type': `${mime}; charset=utf-8`, 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff', 'Content-Security-Policy': "default-src 'self'; style-src 'self'; script-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'" });

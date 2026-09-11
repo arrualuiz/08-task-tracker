@@ -9,7 +9,17 @@ Criar e acompanhar tarefas no computador e no Chrome do iPhone 11, sem instalar 
 
 ## O que existe no código
 
-### Entrega atual: revisão local persistente
+### Entrega atual: planejamento do dia (10/09/2026)
+
+A página inicial agora é `site/dia.html`, com `dia.js` e `dia.css`. Permite escolher uma data, adicionar tarefas livres ou sugestões das rotinas, editar comentários, horário opcional e duração, remover do dia, concluir/reabrir e ordenar por arraste ou setas. Os grupos são manhã, tarde, noite e sem bloco definido; cada item pode mudar de grupo pelo seletor. Reservas de tempo exigem início e duração e avisam sobre sobreposição. Reservar significa blocar tempo no planejamento local, não criar um evento Google.
+
+Sugestões priorizam rotinas aprovadas e usam afinidade com a data e frequência revisada; pendentes aparecem identificadas e pausadas/informações são omitidas. Busca e filtro por conta atuam nas sugestões, com opção de consultar todas as rotinas ativas. Não há geração automática de ocorrências ICS: término, intervalos e exceções precisam de conferência manual na revisão. A seleção para um dia não muda aprovação da série; conclusão é independente e remoção não registra falha.
+
+`local/planner.cjs` acrescenta tabelas ao SQLite existente, sem reimportar dados. A API `/api/days/:date` salva o conjunto ordenado com versão e histórico na mesma transação; IDs estáveis e uma seleção por rotina/data evitam duplicatas. Repetir um salvamento idêntico não duplica histórico. Edições são rascunhos até clicar em **Salvar meu dia**; conflitos preservam o rascunho, que pode ser baixado antes de recarregar. Backup JSON versão 2 inclui dias e histórico. A tela mostra o resumo das versões; restauração pela interface permanece planejada.
+
+Validação: sintaxe e seis testes isolados de persistência/API, sem alterar tarefas reais. Layout responsivo; validação no iPhone físico e disponibilização fora de localhost permanecem pendentes. Google, Sheets, Calendar e Alexa não ganharam integração nesta entrega.
+
+### Revisão local persistente, preservada em /revisao
 
 A página de revisão está em `site/revisao.html`, `revisao.css` e `revisao.js`. `npm start` inicia `local/server.cjs` em http://localhost:3210. `local/store.cjs` importa os 111 registros principais uma única vez e mantém `dados-locais/task-tracker.sqlite` como fonte de verdade. A exceção fica anexada à série correspondente.
 
@@ -29,7 +39,7 @@ Revisar antes de ativar: 47 eventos principais com duração zero, dez séries d
 
 O modelo de dados deverá incluir `accountId` e `calendarId` na origem, além de `UID` do ICS e identidade da ocorrência. O UID exportado não deve ser usado diretamente como eventId da API. A autorização da conta ainda precisa ser conectada; possuir o ICS não concede acesso à agenda.
 
-Revisão de rotinas por conta/categoria entregue localmente, com aprovação da série. Próxima entrega: gerar ocorrências para o planejamento diário e seleção Fazer por ocorrência. Manter Concluída como ação separada e preservar o histórico entre os dias.
+Revisão de rotinas por conta/categoria e seleção manual por dia entregues localmente. Próxima entrega: expansão completa de ocorrências ICS e integração externa, mantendo conclusão separada e histórico entre os dias.
 
 | Arquivo | Responsabilidade e estado atual |
 | --- | --- |
@@ -43,7 +53,7 @@ Revisão de rotinas por conta/categoria entregue localmente, com aprovação da 
 
 O quadro original é HTML/CSS/JavaScript e Google Apps Script. A revisão acrescenta backend Node.js/SQLite e testes locais. Não há app Kotlin, etapa de build, manifest PWA ou service worker neste checkout.
 
-## Fluxo atual
+## Fluxo do quadro Apps Script anterior
 
 1. O site chama o Apps Script por `fetch`, usando GET e token, inclusive para concluir.
 2. `listar` busca tarefas pendentes de listas do Google Tasks e eventos de hoje da agenda padrão.
@@ -54,7 +64,7 @@ O quadro original é HTML/CSS/JavaScript e Google Apps Script. A revisão acresc
 
 ## Diferenças para o objetivo
 
-- Criar, editar e reabrir tarefas pelo site ainda não existe.
+- Criar, editar e reabrir itens locais está implementado no planejador; integração dessas ações com Google ainda não existe.
 - A planilha é histórico; suas caixas de seleção ainda não criam nem atualizam tarefas.
 - A seleção de listas no site apenas oculta colunas localmente. Não aprova tarefas nem sincroniza essa preferência entre aparelhos.
 - Não existe rotina de geração diária, aprovação por ocorrência ou vínculo tarefa/evento/linha da planilha.

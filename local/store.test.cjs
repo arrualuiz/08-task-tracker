@@ -48,6 +48,45 @@ test('conflito e entrada inválida não alteram registro nem histórico', t => {
 test('normaliza evento UTC para São Paulo',()=>{
   assert.deepEqual(localStart('20260317T220000Z'),{date:'2026-03-17',time:'19:00'});
 });
+
+test('planejamento persiste ordem, comentários e blocos sem alterar a rotina; repetição é idempotente',t=>{
+  const context=setup(t),routine=context.store.list()[0];
+  const a={id:'11111111-1111-4111-8111-111111111111',routineId:routine.id,title:'Escolha diária',block:'morning',kind:'task',time:'',duration:0,notes:'Fazer com calma',account:'Pessoal',done:false};
+  const b={...a,id:'22222222-2222-4222-8222-222222222222',routineId:null,title:'Foco',kind:'block',time:'14:00',duration:60,block:'afternoon'};
+  const first=context.store.planning.save('2026-09-10',{version:0,items:[a,b]});
+  assert.equal(first.version,1);
+  assert.equal(context.store.planning.save('2026-09-10',{version:0,items:[a,b]}).version,1);
+  assert.equal(context.store.planning.history('2026-09-10').length,1);
+  assert.throws(()=>context.store.planning.save('2026-09-10',{version:0,items:[b]}),{status:409});
+  assert.throws(()=>context.store.planning.save('2026-09-10',{version:1,items:[a,{...b,routineId:routine.id}]}),{status:400});
+  assert.throws(()=>context.store.planning.save('2026-09-10',{version:1,items:[{...b,time:''}]}),{status:400});
+  assert.throws(()=>context.store.planning.get('2026-02-30'),{status:400});
+  context.store.planning.save('2026-09-10',{version:1,items:[b,{...a,done:true,block:'evening'}]});
+  context.restart();
+  assert.deepEqual(context.store.planning.get('2026-09-10').items.map(i=>i.id),[b.id,a.id]);
+  assert.equal(context.store.planning.get('2026-09-10').items[1].notes,a.notes);
+  assert.deepEqual(context.store.get(routine.id),routine);
+  assert.equal(context.store.planning.get('2026-09-11').items.length,0);
+  context.store.planning.save('2026-09-10',{version:2,items:[]});
+  assert.equal(context.store.planning.history('2026-09-10').length,3);
+  assert.equal(context.store.export().planning.days.length,1);
+});
+
+test('API diária valida entrada, salva e mantém histórico sem expor dados privados',async t=>{
+  const {store}=setup(t),server=createServer(store);
+  await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
+  t.after(()=>new Promise(resolve=>server.close(resolve)));
+  const base=`http://127.0.0.1:${server.address().port}`;
+  assert.match(await (await fetch(base)).text(),/Como vai ser o seu dia/);
+  for(const asset of ['/dia.js','/dia.css','/revisao'])assert.equal((await fetch(base+asset)).status,200);
+  const url=base+'/api/days/2026-09-10';
+  assert.deepEqual(await (await fetch(url)).json(),{date:'2026-09-10',version:0,items:[]});
+  const body={version:0,items:[{id:'11111111-1111-4111-8111-111111111111',routineId:null,title:'Teste isolado',block:'anytime',kind:'task',time:'',duration:0,notes:'',account:'',done:false}]};
+  assert.equal((await fetch(url,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})).status,200);
+  assert.equal((await (await fetch(url+'/history')).json()).history.length,1);
+  assert.equal((await fetch(url,{method:'PUT',headers:{'Content-Type':'application/json'},body:'null'})).status,400);
+  assert.equal((await fetch(url,{method:'PUT',headers:{'Content-Type':'application/json',Origin:'https://external.example'},body:JSON.stringify(body)})).status,403);
+});
 test('API salva e exporta, restringe origem e não serve arquivos privados',async t=>{
   const {store}=setup(t), server=createServer(store);
   await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));

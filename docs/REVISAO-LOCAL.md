@@ -10,6 +10,10 @@ npm start
 
 Abra http://localhost:3210. Não há dependências externas para instalar nem build do frontend. `npm run check` verifica a sintaxe e `npm test` verifica persistência, conflitos, importação e API com banco temporário.
 
+A página inicial é o planejador **Meu dia**. Escolha a data, adicione itens ou sugestões e use **Salvar meu dia**. Setas/arraste alteram a ordem; o seletor muda o bloco do dia. Reservar horário cria um bloco local com início e duração. Comentários e conclusão pertencem ao item daquele dia. Remover não exclui a rotina original. A revisão descrita abaixo permanece em `/revisao`.
+
+Os dias e seu histórico ficam no mesmo SQLite, em tabelas adicionais. O backup JSON versão 2 inclui o planejamento. A tela mantém rascunhos em memória até salvar; em conflito, baixe o rascunho antes de recarregar. O arquivo de rascunho serve para consulta/cópia manual, sem importador na interface. Não se trata de sincronização com Google e as sugestões ainda exigem conferência de regras e exceções do ICS.
+
 Se o inventário não existir neste computador, gere-o primeiro:
 
 ```powershell
@@ -42,6 +46,6 @@ As 110 séries e o evento avulso formam 111 registros editáveis. A exceção é
 
 ## Limite desta etapa
 
-O servidor escuta somente `127.0.0.1`, verifica Host/Origin e serve uma lista fixa de arquivos. Não publica a pasta do projeto. No iPhone, localhost aponta para o próprio celular; o acesso pelo telefone exigirá outra etapa de disponibilização. O quadro antigo do Apps Script permanece em `site/index.html`, mas a rota local inicial agora é a revisão.
+O servidor escuta somente `127.0.0.1`, verifica Host/Origin e serve uma lista fixa de arquivos. Não publica a pasta do projeto. No iPhone, localhost aponta para o próprio celular; o acesso pelo telefone exigirá outra etapa de disponibilização. O quadro antigo do Apps Script permanece em `site/index.html`, mas a rota local inicial agora é o planejador do dia.
 
 A persistência usa o módulo nativo [node:sqlite](https://nodejs.org/api/sqlite.html); sua API ainda é experimental na linha Node 24 utilizada nesta entrega.

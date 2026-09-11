@@ -96,12 +96,14 @@ function openStore(filename, inventoryFile) {
   }
   const unpack = row => row && ({ id: row.id, ...JSON.parse(row.data), source: JSON.parse(row.source), version: row.version, updatedAt: row.updated_at });
   const get = id => unpack(db.prepare('SELECT * FROM routines WHERE id=?').get(id));
+  const planning = require('./planner.cjs').planner(db, transaction);
   return {
+    planning,
     close: () => db.close(),
     list: () => db.prepare('SELECT * FROM routines ORDER BY id').all().map(unpack),
     get,
     history: id => db.prepare('SELECT * FROM history WHERE routine_id=? ORDER BY id DESC').all(id).map(row => ({ ...row, before: JSON.parse(row.before_json || 'null'), after: JSON.parse(row.after_json), before_json: undefined, after_json: undefined })),
-    export: () => ({ schemaVersion: 1, exportedAt: new Date().toISOString(), routines: db.prepare('SELECT * FROM routines ORDER BY id').all().map(unpack), history: db.prepare('SELECT * FROM history ORDER BY id').all() }),
+    export: () => ({ schemaVersion: 2, exportedAt: new Date().toISOString(), routines: db.prepare('SELECT * FROM routines ORDER BY id').all().map(unpack), history: db.prepare('SELECT * FROM history ORDER BY id').all(), planning: planning.export() }),
     update: (id, input) => transaction(() => {
       const current = get(id);
       if (!current) fail('Rotina não encontrada.', 404);
