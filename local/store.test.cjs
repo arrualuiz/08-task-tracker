@@ -165,5 +165,17 @@ test('classificação de propósito (melhorias e dívidas morais) persiste e cal
   const progressRes = await (await fetch(`${base}/api/overview/progress?days=7&date=2026-09-07`)).json();
   assert.equal(progressRes.moralDebtsTotal, 2);
   assert.equal(progressRes.moralDebtsPaid, 1);
+
+  // Validar novo endpoint de semana e projeção de rotinas
+  const weekRes = await (await fetch(`${base}/api/overview/week?date=2026-09-14&start=MO`)).json();
+  assert.equal(weekRes.days.length, 7);
+  assert.equal(weekRes.startDate, '2026-09-14');
+  assert.equal(weekRes.endDate, '2026-09-20');
+  assert.ok(Array.isArray(weekRes.days[0].items));
+  // O dia sem plano salvo deve ter hasPlan=false e rotinas projetadas
+  const dayWithoutPlan = weekRes.days.find(d => d.date === '2026-09-14');
+  assert.equal(dayWithoutPlan.hasPlan, false);
+  assert.ok(dayWithoutPlan.items.length > 0);
+  assert.equal(dayWithoutPlan.items[0].isProjected, true);
 });
 

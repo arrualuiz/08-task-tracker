@@ -34,6 +34,124 @@ function planner(db, transaction) {
     };
   }
 
+  /** Recupera rotinas ativas para projeção no calendário quando não há plano salvo no dia. */
+  function getActiveRoutines() {
+    try {
+      const rows = db.prepare('SELECT id, data FROM routines').all();
+      return rows.map(r => {
+        const d = JSON.parse(r.data);
+        return { id: r.id, ...d, purpose: d.purpose || 'maintenance' };
+      }).filter(r => r.status !== 'paused' && r.kind !== 'info');
+    } catch {
+      return [];
+    }
+  }
+
+  /**
+   * Avalia afinidade de uma regra de repetição com uma data específica.
+   * Entrada: rotina e data 'YYYY-MM-DD'.
+   * Regra de negócio: DAILY repete todo dia; WEEKLY confere dias da semana;
+   * MONTHLY confere dia fixo do mês ou dia da semana ordinal (ex: 2ª quarta).
+   */
+  function fitsRoutine(r, targetDateStr) {
+    if (r.status === 'paused' || r.kind === 'info') return false;
+    if (r.date && r.date > targetDateStr) return false;
+    const d = new Date(`${targetDateStr}T12:00:00`);
+    const dayKey = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'][d.getDay()];
+    const rec = r.recurrence;
+    if (!rec) return false;
+    if (rec.frequency === 'ONCE') return r.date === targetDateStr;
+    if (rec.frequency === 'DAILY') return true;
+    if (rec.frequency === 'WEEKLY') return Array.isArray(rec.days) && rec.days.includes(dayKey);
+    if (rec.frequency === 'MONTHLY') {
+      if (rec.monthlyMode === 'date') return rec.monthDay === d.getDate();
+      return rec.weekday === dayKey && rec.ordinal === Math.ceil(d.getDate() / 7);
+    }
+    return false;
+  }
+
+  /**
+   * Constrói os dados de um dia com rotinas projetadas ou itens salvos no banco.
+   * Preserva a regra: dias sem plano mostram a projeção da rotina diária sem contar como concluídos.
+   */
+  function buildDayInfo(dateStr, planData, activeRoutines) {
+    const dt = new Date(`${dateStr}T12:00:00`);
+    const dayOfWeek = dt.getDay();
+    const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+    const dayNumber = Number(dateStr.slice(8, 10));
+    const periodicMilestones = [5, 10, 15, 20, 25, 30];
+    const weekdaysNames = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+    const weekdaysKeys = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
+
+    if (planData) {
+      return {
+        date: dateStr,
+        day: dayNumber,
+        weekdayKey: weekdaysKeys[dayOfWeek],
+        weekdayName: weekdaysNames[dayOfWeek],
+        isWeekend,
+        isPeriodicMilestone: periodicMilestones.includes(dayNumber),
+        hasPlan: true,
+        stats: planData.stats,
+        items: planData.items.map(i => ({
+          id: i.id,
+          routineId: i.routineId || null,
+          title: i.title,
+          block: i.block,
+          kind: i.kind,
+          done: i.done,
+          purpose: i.purpose,
+          time: i.time,
+          duration: i.duration,
+          account: i.account || '',
+          isProjected: false
+        }))
+      };
+    }
+
+    // Projetar rotinas recorrentes ativas para o dia não salvo
+    const projectedItems = activeRoutines
+      .filter(r => fitsRoutine(r, dateStr))
+      .sort((a, b) => (a.time || '99:99').localeCompare(b.time || '99:99') || a.title.localeCompare(b.title))
+      .map(r => ({
+        id: r.id,
+        routineId: r.id,
+        title: r.title,
+        block: r.time ? (r.time < '12:00' ? 'morning' : r.time < '18:00' ? 'afternoon' : 'evening') : 'anytime',
+        kind: r.kind || 'task',
+        done: false,
+        purpose: r.purpose || 'maintenance',
+        time: r.time || '',
+        duration: r.duration || 0,
+        account: r.account || '',
+        isProjected: true
+      }));
+
+    const improvements = projectedItems.filter(i => i.purpose === 'improvement').length;
+    const moralDebts = projectedItems.filter(i => i.purpose === 'moral_debt').length;
+
+    return {
+      date: dateStr,
+      day: dayNumber,
+      weekdayKey: weekdaysKeys[dayOfWeek],
+      weekdayName: weekdaysNames[dayOfWeek],
+      isWeekend,
+      isPeriodicMilestone: periodicMilestones.includes(dayNumber),
+      hasPlan: false,
+      stats: {
+        total: projectedItems.length,
+        completed: 0,
+        pending: projectedItems.length,
+        completionRate: 0,
+        improvements,
+        improvementsDone: 0,
+        moralDebts,
+        moralDebtsDone: 0
+      },
+      items: projectedItems
+    };
+  }
+
   return {
     get,
     history: date => { get(date); return db.prepare('SELECT * FROM plan_history WHERE date=? ORDER BY id DESC').all(date); },
@@ -50,7 +168,7 @@ function planner(db, transaction) {
       });
     },
 
-    /** Visão completa do mês com destaques nos marcos 05, 10, 15, 20, 25 e 30. */
+    /** Visão completa do mês com destaques nos marcos 05, 10, 15, 20, 25 e 30 e rotinas diárias projetadas. */
     month: (year, monthStr) => {
       const y = Number(year), m = Number(monthStr);
       if (!Number.isInteger(y) || y < 2000 || y > 2100 || !Number.isInteger(m) || m < 1 || m > 12) {
@@ -67,30 +185,72 @@ function planner(db, transaction) {
         saved.set(r.date, { version: r.version, stats: summarize(items), items });
       }
 
-      const weekdaysNames = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
-      const weekdaysKeys = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
-      const periodicMilestones = [5, 10, 15, 20, 25, 30];
-
+      const activeRoutines = getActiveRoutines();
       const daysList = [];
       for (let d = 1; d <= lastDay; d++) {
         const dateStr = `${y}-${formattedMonth}-${String(d).padStart(2, '0')}`;
-        const dt = new Date(`${dateStr}T12:00:00`);
-        const dayOfWeek = dt.getDay();
-        const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
-        const planData = saved.get(dateStr);
-        daysList.push({
-          date: dateStr,
-          day: d,
-          weekdayKey: weekdaysKeys[dayOfWeek],
-          weekdayName: weekdaysNames[dayOfWeek],
-          isWeekend,
-          isPeriodicMilestone: periodicMilestones.includes(d),
-          hasPlan: Boolean(planData),
-          stats: planData ? planData.stats : { total: 0, completed: 0, pending: 0, completionRate: 0, improvements: 0, improvementsDone: 0, moralDebts: 0, moralDebtsDone: 0 },
-          items: planData ? planData.items.map(i => ({ id: i.id, title: i.title, block: i.block, kind: i.kind, done: i.done, purpose: i.purpose, time: i.time })) : []
-        });
+        daysList.push(buildDayInfo(dateStr, saved.get(dateStr), activeRoutines));
       }
       return { year: y, month: m, formattedMonth, totalDays: lastDay, days: daysList };
+    },
+
+    /**
+     * Visão semanal com colunas por dia e rotinas detalhadas.
+     * Suporta semana começando na Segunda ('MO') ou Domingo ('SU').
+     */
+    week: (referenceDate = null, weekStart = 'MO') => {
+      let ref = referenceDate;
+      if (!ref) {
+        const d = new Date();
+        ref = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      }
+      if (!validDate(ref)) invalid('Data de referência inválida.');
+
+      const refDt = new Date(`${ref}T12:00:00`);
+      const refDayOfWeek = refDt.getDay(); // 0 = Domingo, 1 = Segunda, ...
+
+      // Calcular offset para o início da semana
+      let offsetToStart = 0;
+      if (weekStart === 'MO') {
+        // Segunda-feira como dia 0 da semana
+        offsetToStart = (refDayOfWeek + 6) % 7;
+      } else {
+        // Domingo como dia 0 da semana
+        offsetToStart = refDayOfWeek;
+      }
+
+      const startDt = new Date(refDt.getTime() - offsetToStart * 86400000);
+      const daysList = [];
+      const activeRoutines = getActiveRoutines();
+
+      // Buscar planos salvos no intervalo da semana
+      const weekDates = [];
+      for (let i = 0; i < 7; i++) {
+        const curDt = new Date(startDt.getTime() + i * 86400000);
+        weekDates.push(`${curDt.getFullYear()}-${String(curDt.getMonth() + 1).padStart(2, '0')}-${String(curDt.getDate()).padStart(2, '0')}`);
+      }
+
+      const startDateStr = weekDates[0];
+      const endDateStr = weekDates[6];
+
+      const saved = new Map();
+      const rows = db.prepare('SELECT date, data, version FROM plans WHERE date >= ? AND date <= ?').all(startDateStr, endDateStr);
+      for (const r of rows) {
+        const items = JSON.parse(r.data).map(i => ({ ...i, purpose: i.purpose || 'maintenance' }));
+        saved.set(r.date, { version: r.version, stats: summarize(items), items });
+      }
+
+      for (const dateStr of weekDates) {
+        daysList.push(buildDayInfo(dateStr, saved.get(dateStr), activeRoutines));
+      }
+
+      return {
+        referenceDate: ref,
+        weekStart,
+        startDate: startDateStr,
+        endDate: endDateStr,
+        days: daysList
+      };
     },
 
     /** Calcula avanço dos últimos N dias: taxa de cumprimento, dívidas morais quitadas e melhorias. */

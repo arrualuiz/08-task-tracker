@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Mês & Avanço · Task Tracker</title>
+  <title>Mês & Semana · Task Tracker</title>
   <link rel="stylesheet" href="/dia.css">
   <link rel="stylesheet" href="/calendarios.css">
   <link rel="stylesheet" href="/mes.css">
@@ -17,128 +17,219 @@
 
   <nav class="app-tabs" aria-label="Funções do site">
     <a href="/">Meu dia</a>
-    <a href="/mes" aria-current="page">Mês & Avanço</a>
+    <a href="/mes" aria-current="page">Mês & Semana</a>
     <a href="/calendarios">Calendários</a>
     <a href="/tarefas">Google Tasks</a>
     <a href="/revisao">Revisão de rotinas</a>
   </nav>
 
   <main class="month-main">
-    <!-- Cabeçalho da página com navegação entre meses -->
+    <!-- Cabeçalho da página com controles de navegação e modos de visualização -->
     <div class="month-heading">
       <div>
-        <p class="eyebrow">VISÃO PANORÂMICA & EVOLUÇÃO</p>
-        <h1 id="month-title">Mês & Avanço</h1>
-        <p>Acompanhe seus marcos periódicos, a consistência dos seus dias e o saldo entre dívidas morais e melhorias.</p>
+        <p class="eyebrow">VISÃO PANORÂMICA & ROTINAS DIÁRIAS</p>
+        <h1 id="calendar-title">Setembro de 2026</h1>
+        <p id="calendar-subtitle">Acompanhe suas rotinas diárias distribuídas pelo mês e navegue na semana certinha.</p>
       </div>
-      <div class="month-controls">
-        <button id="prev-month" class="secondary" type="button" aria-label="Mês anterior">← Mês anterior</button>
-        <button id="today-month" class="secondary" type="button">Hoje</button>
-        <button id="next-month" class="secondary" type="button" aria-label="Próximo mês">Próximo mês →</button>
+
+      <div class="calendar-toolbar">
+        <!-- Navegação temporal anterior/hoje/próximo -->
+        <div class="month-controls" role="group" aria-label="Navegação temporal">
+          <button id="nav-prev" class="secondary" type="button" aria-label="Período anterior">← Anterior</button>
+          <button id="nav-today" class="secondary" type="button">Hoje</button>
+          <button id="nav-next" class="secondary" type="button" aria-label="Próximo período">Próximo →</button>
+        </div>
+
+        <!-- Seletor de Visão: Mês Completo vs Semana ("semana certinha") -->
+        <div class="view-selector" role="group" aria-label="Modo de visualização">
+          <button id="btn-view-month" class="view-toggle-btn active" type="button" aria-pressed="true">Mês completo</button>
+          <button id="btn-view-week" class="view-toggle-btn" type="button" aria-pressed="false">Semana certinha</button>
+        </div>
+
+        <!-- Seletor de escopo da semana (7 dias vs 5 dias úteis) visível no modo semana -->
+        <div id="week-scope-container" class="week-scope-container hidden">
+          <label for="week-scope-select" class="sr-only">Escopo da semana</label>
+          <select id="week-scope-select" aria-label="Dias exibidos na semana">
+            <option value="7">7 dias (Seg a Dom)</option>
+            <option value="5">5 dias úteis (Seg a Sex)</option>
+          </select>
+        </div>
+
+        <!-- Alternador do Mês Reduzido (Mini-calendário lateral) -->
+        <button id="toggle-sidebar-btn" class="secondary" type="button" aria-expanded="true" title="Alternar mini-calendário lateral">
+          📅 Mini-Mês
+        </button>
       </div>
     </div>
 
-    <!-- Painel de Avanço e Métricas Recentes -->
-    <section class="progress-section" aria-label="Métricas de avanço recente">
-      <div class="progress-header">
-        <div>
-          <h2>Avanço nos últimos dias</h2>
-          <p class="hint">Veja se você está avançando, quitando pendências acumuladas e construindo melhorias.</p>
-        </div>
-        <div class="period-selector" role="group" aria-label="Período do avanço">
-          <button id="period-7" class="period-btn" type="button" data-days="7">Últimos 7 dias</button>
-          <button id="period-14" class="period-btn active" type="button" data-days="14">Últimos 14 dias</button>
-          <button id="period-30" class="period-btn" type="button" data-days="30">Últimos 30 dias</button>
-        </div>
-      </div>
-
-      <div class="metrics-grid">
-        <div class="metric-card rate-card">
-          <span class="metric-icon">📈</span>
+    <!-- Painel de Avanço e Métricas Recentes (recolhível para foco nas rotinas) -->
+    <details class="progress-details" open>
+      <summary class="progress-summary">
+        <span>📈 <strong>Avanço e Métricas Recentes</strong></span>
+        <span class="summary-hint">Clique para recolher ou ver detalhes</span>
+      </summary>
+      <section class="progress-section" aria-label="Métricas de avanço recente">
+        <div class="progress-header">
           <div>
-            <span class="metric-label">Taxa de Realização</span>
-            <div class="metric-value-row">
-              <strong id="metric-rate" class="metric-value">0%</strong>
-              <span id="metric-tasks-ratio" class="metric-sub">0 de 0 tarefas</span>
+            <h2>Consistência e saldo recente</h2>
+            <p class="hint">Veja a evolução de dívidas morais quitadas, melhorias e constância diária.</p>
+          </div>
+          <div class="period-selector" role="group" aria-label="Período do avanço">
+            <button id="period-7" class="period-btn" type="button" data-days="7">7 dias</button>
+            <button id="period-14" class="period-btn active" type="button" data-days="14">14 dias</button>
+            <button id="period-30" class="period-btn" type="button" data-days="30">30 dias</button>
+          </div>
+        </div>
+
+        <div class="metrics-grid">
+          <div class="metric-card rate-card">
+            <span class="metric-icon">📈</span>
+            <div>
+              <span class="metric-label">Taxa de Realização</span>
+              <div class="metric-value-row">
+                <strong id="metric-rate" class="metric-value">0%</strong>
+                <span id="metric-tasks-ratio" class="metric-sub">0 de 0 tarefas</span>
+              </div>
+              <div class="metric-bar-bg">
+                <div id="metric-rate-bar" class="metric-bar-fill" style="width: 0%"></div>
+              </div>
             </div>
-            <div class="metric-bar-bg">
-              <div id="metric-rate-bar" class="metric-bar-fill" style="width: 0%"></div>
+          </div>
+
+          <div class="metric-card debt-card">
+            <span class="metric-icon">⏳</span>
+            <div>
+              <span class="metric-label">Dívidas Morais Quitadas</span>
+              <div class="metric-value-row">
+                <strong id="metric-debts-paid" class="metric-value">0</strong>
+                <span id="metric-debts-ratio" class="metric-sub">de 0 pendências</span>
+              </div>
+              <div class="metric-bar-bg">
+                <div id="metric-debts-bar" class="metric-bar-fill debt-fill" style="width: 0%"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="metric-card improvement-card">
+            <span class="metric-icon">🌟</span>
+            <div>
+              <span class="metric-label">Melhorias Conquistadas</span>
+              <div class="metric-value-row">
+                <strong id="metric-improvements-done" class="metric-value">0</strong>
+                <span id="metric-improvements-ratio" class="metric-sub">de 0 planejadas</span>
+              </div>
+              <div class="metric-bar-bg">
+                <div id="metric-improvements-bar" class="metric-bar-fill improvement-fill" style="width: 0%"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="metric-card consistency-card">
+            <span class="metric-icon">🎯</span>
+            <div>
+              <span class="metric-label">Dias com Planejamento</span>
+              <div class="metric-value-row">
+                <strong id="metric-active-days" class="metric-value">0</strong>
+                <span id="metric-period-days" class="metric-sub">de 14 dias</span>
+              </div>
+              <p id="metric-consistency-hint" class="metric-footnote">Constância diária</p>
             </div>
           </div>
         </div>
 
-        <div class="metric-card debt-card">
-          <span class="metric-icon">⏳</span>
-          <div>
-            <span class="metric-label">Dívidas Morais Quitadas</span>
-            <div class="metric-value-row">
-              <strong id="metric-debts-paid" class="metric-value">0</strong>
-              <span id="metric-debts-ratio" class="metric-sub">de 0 pendências</span>
-            </div>
-            <div class="metric-bar-bg">
-              <div id="metric-debts-bar" class="metric-bar-fill debt-fill" style="width: 0%"></div>
-            </div>
-          </div>
+        <!-- Linha do tempo de consistência recente -->
+        <div class="timeline-container">
+          <h3>Consistência diária no período</h3>
+          <div id="progress-timeline" class="progress-timeline" role="list"></div>
         </div>
-
-        <div class="metric-card improvement-card">
-          <span class="metric-icon">🌟</span>
-          <div>
-            <span class="metric-label">Melhorias Conquistadas</span>
-            <div class="metric-value-row">
-              <strong id="metric-improvements-done" class="metric-value">0</strong>
-              <span id="metric-improvements-ratio" class="metric-sub">de 0 planejadas</span>
-            </div>
-            <div class="metric-bar-bg">
-              <div id="metric-improvements-bar" class="metric-bar-fill improvement-fill" style="width: 0%"></div>
-            </div>
-          </div>
-        </div>
-
-        <div class="metric-card consistency-card">
-          <span class="metric-icon">🎯</span>
-          <div>
-            <span class="metric-label">Dias com Planejamento</span>
-            <div class="metric-value-row">
-              <strong id="metric-active-days" class="metric-value">0</strong>
-              <span id="metric-period-days" class="metric-sub">de 14 dias</span>
-            </div>
-            <p id="metric-consistency-hint" class="metric-footnote">Constância diária</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Linha do tempo de consistência recente -->
-      <div class="timeline-container">
-        <h3>Consistência diária no período</h3>
-        <div id="progress-timeline" class="progress-timeline" role="list"></div>
-      </div>
-    </section>
+      </section>
+    </details>
 
     <!-- Legenda dos marcos periódicos e tipos de propósito -->
     <div class="month-legend">
-      <span class="legend-item"><span class="legend-badge milestone-badge">★ Dia 05, 10, 15, 20, 25, 30</span> Marcos periódicos & revisões</span>
-      <span class="legend-item"><span class="legend-badge improvement-badge">🌟 Melhoria</span> Hábito / Evolução pessoal</span>
-      <span class="legend-item"><span class="legend-badge debt-badge">⏳ Dívida Moral</span> Pendência pesada / Débito moral</span>
-      <span class="legend-item"><span class="legend-badge weekend-badge">Fim de semana</span> Rotinas de descanso e lazer</span>
+      <span class="legend-item"><span class="legend-badge milestone-badge">★ Marcos periódicos (05, 10, 15, 20, 25, 30)</span></span>
+      <span class="legend-item"><span class="legend-badge improvement-badge">🌟 Melhoria</span></span>
+      <span class="legend-item"><span class="legend-badge debt-badge">⏳ Dívida Moral</span></span>
+      <span class="legend-item"><span class="legend-badge routine-badge">🔄 Rotina diária</span></span>
     </div>
 
-    <!-- Mensagem de status -->
-    <p id="month-notice" role="status" aria-live="polite">Carregando calendário do mês…</p>
+    <!-- Mensagem de status / feedback -->
+    <p id="month-notice" role="status" aria-live="polite">Carregando calendário…</p>
 
-    <!-- Grade do Mês -->
-    <section class="calendar-grid-section" aria-label="Grade do mês">
-      <div class="calendar-grid-header">
-        <span>Dom</span>
-        <span>Seg</span>
-        <span>Ter</span>
-        <span>Qua</span>
-        <span>Qui</span>
-        <span>Sex</span>
-        <span>Sáb</span>
+    <!-- Layout integrado: Painel do Mini-Mês (Mês Reduzido) + Área Principal de Calendário -->
+    <div class="calendar-workspace">
+      <!-- Barra lateral: Visão de Mês Reduzida (Mini-calendário compacto) e filtros -->
+      <aside id="calendar-sidebar" class="calendar-sidebar" aria-label="Mini calendário e filtros">
+        <div class="mini-month-card">
+          <div class="mini-month-header">
+            <h3 id="mini-month-title">Setembro 2026</h3>
+            <div class="mini-month-nav">
+              <button id="mini-prev" type="button" aria-label="Mês anterior no mini calendário">‹</button>
+              <button id="mini-next" type="button" aria-label="Próximo mês no mini calendário">›</button>
+            </div>
+          </div>
+          <div class="mini-month-weekdays">
+            <span>D</span><span>S</span><span>T</span><span>Q</span><span>Q</span><span>S</span><span>S</span>
+          </div>
+          <div id="mini-month-grid" class="mini-month-grid"></div>
+        </div>
+
+        <!-- Filtros rápidos de conta e propósito -->
+        <div class="sidebar-filters">
+          <h4>Filtrar rotinas</h4>
+          <label for="filter-account" class="filter-label">Conta</label>
+          <select id="filter-account">
+            <option value="">Todas as contas</option>
+          </select>
+
+          <label for="filter-purpose" class="filter-label">Propósito</label>
+          <select id="filter-purpose">
+            <option value="">Todos os propósitos</option>
+            <option value="improvement">🌟 Melhorias</option>
+            <option value="moral_debt">⏳ Dívidas morais</option>
+            <option value="maintenance">🔄 Rotinas de manutenção</option>
+          </select>
+        </div>
+      </aside>
+
+      <!-- Área de Exibição Principal: Mês Completo OU Semana Certinha -->
+      <div class="calendar-main-view">
+        <!-- 1. Visão de Mês Completa com Rotinas Diárias (estilo Imagem 2) -->
+        <section id="view-month-container" class="calendar-grid-section" aria-label="Grade do mês completo">
+          <div class="calendar-grid-header">
+            <span>Dom</span>
+            <span>Seg</span>
+            <span>Ter</span>
+            <span>Qua</span>
+            <span>Qui</span>
+            <span>Sex</span>
+            <span>Sáb</span>
+          </div>
+          <div id="calendar-grid" class="calendar-grid"></div>
+        </section>
+
+        <!-- 2. Visão de Semana Certinha com Colunas e Horários (estilo Imagem 1) -->
+        <section id="view-week-container" class="week-grid-section hidden" aria-label="Grade semanal detalhada">
+          <div id="week-grid-header" class="week-grid-header"></div>
+          <div id="week-grid-columns" class="week-grid-columns"></div>
+        </section>
       </div>
-      <div id="calendar-grid" class="calendar-grid"></div>
-    </section>
+    </div>
+
+    <!-- Modal para visualização completa das rotinas de um dia específico -->
+    <dialog id="day-detail-dialog" class="day-dialog">
+      <div class="dialog-header">
+        <div>
+          <h2 id="dialog-day-title">Rotinas do Dia</h2>
+          <p id="dialog-day-subtitle" class="hint">Lista completa de rotinas diárias e tarefas planejadas.</p>
+        </div>
+        <button id="dialog-close-btn" type="button" class="secondary" aria-label="Fechar resumo">✕</button>
+      </div>
+      <div id="dialog-day-items" class="dialog-day-items"></div>
+      <div class="dialog-actions">
+        <a id="dialog-open-day-link" class="button-primary" href="#">Abrir planejamento deste dia →</a>
+      </div>
+    </dialog>
   </main>
 </body>
 </html>

@@ -1,14 +1,15 @@
-/** Estilos refinados para a visão mensal, marcos periódicos e acompanhamento de avanço. */
+/** Estilos refinados para a visão mensal completa, mini-mês reduzido e semana com rotinas diárias. */
 
 .month-main {
-  max-width: 1280px;
+  max-width: 1440px;
   margin: 0 auto;
   padding: 1.5rem 1rem 3rem;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1.25rem;
 }
 
+/* Cabeçalho da página e barra de ferramentas */
 .month-heading {
   display: flex;
   justify-content: space-between;
@@ -17,24 +18,104 @@
   gap: 1rem;
 }
 
-.month-controls {
+.calendar-toolbar {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 0.5rem;
 }
 
-.month-controls button {
-  min-height: 44px;
-  padding: 0.5rem 1rem;
+.month-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
 }
 
-/* Painel de Avanço e Métricas */
-.progress-section {
+.month-controls button,
+#toggle-sidebar-btn {
+  min-height: 40px;
+  padding: 0.4rem 0.85rem;
+  font-size: 0.85rem;
+}
+
+/* Seletor de Modo de Exibição (Mês Completo vs Semana Certinha) */
+.view-selector {
+  display: inline-flex;
+  background: rgba(0, 0, 0, 0.35);
+  padding: 3px;
+  border-radius: 8px;
+  border: 1px solid var(--border, #2e3544);
+}
+
+.view-toggle-btn {
+  background: transparent;
+  color: var(--text-secondary, #94a3b8);
+  border: none;
+  padding: 0.45rem 0.95rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  border-radius: 6px;
+  cursor: pointer;
+  min-height: 38px;
+  transition: all 0.15s ease;
+}
+
+.view-toggle-btn:hover {
+  color: #fff;
+}
+
+.view-toggle-btn.active {
+  background: var(--primary, #3b82f6);
+  color: #ffffff;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.4);
+}
+
+.week-scope-container select {
+  min-height: 40px;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.85rem;
+  background: var(--surface, #1e222b);
+  border: 1px solid var(--border, #2e3544);
+  color: var(--text-primary, #f1f5f9);
+  border-radius: 6px;
+}
+
+/* Painel de Avanço Recolhível */
+.progress-details {
   background: var(--surface, #1e222b);
   border: 1px solid var(--border, #2e3544);
   border-radius: 12px;
-  padding: 1.25rem;
+  overflow: hidden;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.progress-summary {
+  padding: 0.85rem 1.25rem;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.95rem;
+  color: var(--text-primary, #f1f5f9);
+  background: rgba(255, 255, 255, 0.02);
+  user-select: none;
+  transition: background 0.15s ease;
+}
+
+.progress-summary:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.summary-hint {
+  font-size: 0.8rem;
+  color: var(--text-secondary, #94a3b8);
+  font-weight: normal;
+}
+
+.progress-section {
+  padding: 1.25rem;
+  border-top: 1px solid var(--border, #2e3544);
 }
 
 .progress-header {
@@ -48,7 +129,7 @@
 
 .progress-header h2 {
   margin: 0 0 0.25rem;
-  font-size: 1.25rem;
+  font-size: 1.15rem;
   color: var(--text-primary, #f1f5f9);
 }
 
@@ -64,11 +145,11 @@
   background: transparent;
   color: var(--text-secondary, #94a3b8);
   border: none;
-  padding: 0.4rem 0.85rem;
-  font-size: 0.85rem;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.8rem;
   border-radius: 6px;
   cursor: pointer;
-  min-height: 38px;
+  min-height: 34px;
   transition: all 0.15s ease;
 }
 
@@ -80,62 +161,54 @@
   background: var(--primary, #3b82f6);
   color: #ffffff;
   font-weight: 600;
-  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.4);
 }
 
-/* Grade de Métricas */
 .metrics-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 1rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.25rem;
 }
 
 .metric-card {
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid var(--border, #2e3544);
   border-radius: 10px;
-  padding: 1rem;
+  padding: 0.85rem;
   display: flex;
-  gap: 0.85rem;
+  gap: 0.75rem;
   align-items: flex-start;
-  transition: transform 0.15s ease, border-color 0.15s ease;
-}
-
-.metric-card:hover {
-  transform: translateY(-2px);
-  border-color: rgba(255, 255, 255, 0.15);
 }
 
 .metric-icon {
-  font-size: 1.75rem;
+  font-size: 1.5rem;
   line-height: 1;
 }
 
 .metric-label {
   display: block;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: var(--text-secondary, #94a3b8);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.2rem;
 }
 
 .metric-value-row {
   display: flex;
   align-items: baseline;
   gap: 0.5rem;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.4rem;
 }
 
 .metric-value {
-  font-size: 1.6rem;
+  font-size: 1.4rem;
   font-weight: 700;
   color: #ffffff;
 }
 
 .metric-sub {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: var(--text-secondary, #94a3b8);
 }
 
@@ -147,11 +220,11 @@
 
 .metric-bar-bg {
   background: rgba(0, 0, 0, 0.3);
-  height: 6px;
+  height: 5px;
   border-radius: 3px;
   overflow: hidden;
   width: 100%;
-  min-width: 140px;
+  min-width: 120px;
 }
 
 .metric-bar-fill {
@@ -161,41 +234,34 @@
   transition: width 0.4s ease;
 }
 
-.debt-fill {
-  background: #f59e0b;
-}
+.debt-fill { background: #f59e0b; }
+.improvement-fill { background: #10b981; }
 
-.improvement-fill {
-  background: #10b981;
-}
-
-/* Linha do tempo de consistência */
 .timeline-container h3 {
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   color: var(--text-secondary, #94a3b8);
-  margin: 0 0 0.75rem;
-  font-weight: 500;
+  margin: 0 0 0.5rem;
 }
 
 .progress-timeline {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.4rem;
   overflow-x: auto;
-  padding-bottom: 0.5rem;
+  padding-bottom: 0.4rem;
   -webkit-overflow-scrolling: touch;
 }
 
 .timeline-day {
   flex: 1;
-  min-width: 52px;
+  min-width: 48px;
   background: rgba(0, 0, 0, 0.2);
   border: 1px solid var(--border, #2e3544);
-  border-radius: 8px;
-  padding: 0.5rem 0.25rem;
+  border-radius: 6px;
+  padding: 0.4rem 0.2rem;
   text-align: center;
   cursor: pointer;
   transition: all 0.15s ease;
-  min-height: 70px;
+  min-height: 60px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -212,48 +278,35 @@
 }
 
 .timeline-day-date {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 600;
   color: var(--text-primary, #f1f5f9);
 }
 
 .timeline-day-status {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 700;
-  padding: 2px 4px;
+  padding: 1px 3px;
   border-radius: 4px;
-  margin-top: 4px;
 }
 
-.status-full {
-  background: rgba(16, 185, 129, 0.2);
-  color: #10b981;
-}
-
-.status-partial {
-  background: rgba(245, 158, 11, 0.2);
-  color: #f59e0b;
-}
-
-.status-empty {
-  color: var(--text-secondary, #64748b);
-  font-weight: normal;
-}
+.status-full { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+.status-partial { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+.status-empty { color: var(--text-secondary, #64748b); font-weight: normal; }
 
 /* Legenda */
 .month-legend {
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem;
-  font-size: 0.85rem;
+  gap: 0.75rem;
+  font-size: 0.8rem;
   color: var(--text-secondary, #94a3b8);
-  padding: 0.5rem 0;
 }
 
 .legend-item {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.35rem;
 }
 
 .legend-badge {
@@ -263,97 +316,236 @@
   font-weight: 600;
 }
 
-.milestone-badge {
-  background: rgba(245, 158, 11, 0.15);
-  border: 1px solid #f59e0b;
-  color: #f59e0b;
+.milestone-badge { background: rgba(245, 158, 11, 0.15); border: 1px solid #f59e0b; color: #f59e0b; }
+.improvement-badge { background: rgba(16, 185, 129, 0.15); border: 1px solid #10b981; color: #10b981; }
+.debt-badge { background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; color: #ef4444; }
+.routine-badge { background: rgba(59, 130, 246, 0.15); border: 1px solid #3b82f6; color: #60a5fa; }
+
+/* Layout da Área de Trabalho (Sidebar Mini-Mês + Conteúdo Principal) */
+.calendar-workspace {
+  display: flex;
+  gap: 1.25rem;
+  align-items: flex-start;
 }
 
-.improvement-badge {
-  background: rgba(16, 185, 129, 0.15);
-  border: 1px solid #10b981;
-  color: #10b981;
+/* Barra Lateral / Mini-Calendário (Mês Reduzido) */
+.calendar-sidebar {
+  width: 250px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  transition: all 0.2s ease;
 }
 
-.debt-badge {
-  background: rgba(239, 68, 68, 0.15);
-  border: 1px solid #ef4444;
-  color: #ef4444;
+.calendar-sidebar.collapsed {
+  display: none;
 }
 
-.weekend-badge {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid var(--border, #2e3544);
-  color: var(--text-primary, #f1f5f9);
-}
-
-/* Grade do Mês */
-.calendar-grid-section {
+.mini-month-card {
   background: var(--surface, #1e222b);
   border: 1px solid var(--border, #2e3544);
   border-radius: 12px;
   padding: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.mini-month-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.mini-month-header h3 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text-primary, #f1f5f9);
+}
+
+.mini-month-nav button {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary, #94a3b8);
+  font-size: 1.1rem;
+  padding: 2px 6px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.mini-month-nav button:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.mini-month-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-secondary, #94a3b8);
+  margin-bottom: 0.35rem;
+}
+
+.mini-month-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.mini-day {
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  color: var(--text-primary, #f1f5f9);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.1s ease;
+  user-select: none;
+}
+
+.mini-day:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.mini-day.pad {
+  opacity: 0.2;
+  cursor: default;
+  pointer-events: none;
+}
+
+.mini-day.milestone {
+  font-weight: 700;
+  color: #f59e0b;
+}
+
+.mini-day.today {
+  background: #3b82f6;
+  color: #fff;
+  font-weight: 700;
+}
+
+.mini-day.selected {
+  outline: 2px solid #60a5fa;
+  outline-offset: 1px;
+}
+
+.mini-day.active-week {
+  background: rgba(59, 130, 246, 0.15);
+  border-radius: 4px;
+}
+
+/* Filtros rápidos da Sidebar */
+.sidebar-filters {
+  background: var(--surface, #1e222b);
+  border: 1px solid var(--border, #2e3544);
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.sidebar-filters h4 {
+  margin: 0 0 0.75rem;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary, #94a3b8);
+}
+
+.filter-label {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-secondary, #94a3b8);
+  margin-bottom: 0.25rem;
+}
+
+.sidebar-filters select {
+  width: 100%;
+  padding: 0.4rem 0.5rem;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--border, #2e3544);
+  color: var(--text-primary, #f1f5f9);
+  border-radius: 6px;
+  font-size: 0.8rem;
+  margin-bottom: 0.75rem;
+}
+
+/* Área de Visualização Principal */
+.calendar-main-view {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ========================================================
+   1. VISÃO MÊS COMPLETO (estilo Imagem 2 do Google Agenda)
+   ======================================================== */
+.calendar-grid-section {
+  background: var(--surface, #1e222b);
+  border: 1px solid var(--border, #2e3544);
+  border-radius: 12px;
+  padding: 0.75rem;
   overflow-x: auto;
 }
 
 .calendar-grid-header {
   display: grid;
   grid-template-columns: repeat(7, minmax(130px, 1fr));
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
+  gap: 0.4rem;
+  margin-bottom: 0.4rem;
   text-align: center;
   font-weight: 600;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: var(--text-secondary, #94a3b8);
-  padding: 0.5rem 0;
+  padding: 0.35rem 0;
   border-bottom: 1px solid var(--border, #2e3544);
 }
 
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, minmax(130px, 1fr));
-  gap: 0.5rem;
+  gap: 0.4rem;
 }
 
 .calendar-cell {
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid var(--border, #2e3544);
   border-radius: 8px;
-  min-height: 105px;
-  padding: 0.5rem;
+  min-height: 140px;
+  max-height: 200px;
+  padding: 0.4rem;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
   cursor: pointer;
   transition: all 0.15s ease;
   position: relative;
+  overflow: hidden;
 }
 
 .calendar-cell:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.04);
   border-color: #3b82f6;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
 }
 
 .calendar-cell.pad {
-  opacity: 0.25;
+  opacity: 0.2;
   cursor: default;
   pointer-events: none;
   background: transparent;
   border-style: dashed;
 }
 
-/* Destaque para os marcos periódicos 05, 10, 15, 20, 25, 30 */
 .calendar-cell.milestone {
   border: 1px solid #f59e0b;
-  background: rgba(245, 158, 11, 0.06);
-  box-shadow: inset 0 0 12px rgba(245, 158, 11, 0.08);
+  background: rgba(245, 158, 11, 0.05);
 }
 
 .calendar-cell.milestone:hover {
   border-color: #fbbf24;
-  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.25);
 }
 
 .calendar-cell.weekend {
@@ -368,114 +560,418 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.4rem;
+  margin-bottom: 0.35rem;
+  flex-shrink: 0;
 }
 
 .cell-number {
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: 700;
   color: var(--text-primary, #f1f5f9);
 }
 
 .milestone-tag {
-  font-size: 0.65rem;
+  font-size: 0.6rem;
   font-weight: 700;
   background: #f59e0b;
   color: #1a1500;
   padding: 1px 4px;
   border-radius: 3px;
-  letter-spacing: 0.02em;
 }
 
-.cell-content {
+/* Lista de Chips de Rotinas dentro do Dia no Mês */
+.cell-routines-list {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 3px;
+  overflow: hidden;
+  flex: 1;
 }
 
-.cell-badge-row {
+.routine-chip {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.25rem;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.72rem;
+  padding: 2px 5px;
+  background: rgba(59, 130, 246, 0.15);
+  border-left: 3px solid #3b82f6;
+  border-radius: 3px;
+  color: var(--text-primary, #f1f5f9);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
 }
 
-.cell-badge {
+.routine-chip.improvement {
+  background: rgba(16, 185, 129, 0.15);
+  border-left-color: #10b981;
+}
+
+.routine-chip.moral_debt {
+  background: rgba(239, 68, 68, 0.15);
+  border-left-color: #ef4444;
+}
+
+.routine-chip.done {
+  opacity: 0.55;
+  text-decoration: line-through;
+}
+
+.chip-time {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--text-secondary, #94a3b8);
+  flex-shrink: 0;
+}
+
+.chip-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Pílula "+ Mais N" no dia */
+.more-routines-badge {
   font-size: 0.7rem;
-  padding: 1px 4px;
-  border-radius: 4px;
+  font-weight: 600;
+  color: #3b82f6;
+  background: rgba(59, 130, 246, 0.1);
+  padding: 2px 4px;
+  border-radius: 3px;
+  text-align: center;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.more-routines-badge:hover {
+  background: rgba(59, 130, 246, 0.25);
+  text-decoration: underline;
+}
+
+/* ========================================================
+   2. VISÃO SEMANA CERTINHA (estilo Imagem 1 do Google Agenda)
+   ======================================================== */
+.week-grid-section {
+  background: var(--surface, #1e222b);
+  border: 1px solid var(--border, #2e3544);
+  border-radius: 12px;
+  padding: 0.75rem;
+  overflow-x: auto;
+}
+
+.week-grid-header {
+  display: grid;
+  grid-template-columns: repeat(var(--week-cols, 7), minmax(140px, 1fr));
+  gap: 0.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border, #2e3544);
+  margin-bottom: 0.75rem;
+}
+
+.week-col-header {
+  text-align: center;
+  padding: 0.4rem;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 8px;
+  border: 1px solid transparent;
+}
+
+.week-col-header.today {
+  border-color: #3b82f6;
+  background: rgba(59, 130, 246, 0.08);
+}
+
+.week-col-weekday {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary, #94a3b8);
+  text-transform: uppercase;
+}
+
+.week-col-daynum {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary, #f1f5f9);
+  margin-top: 2px;
+}
+
+.week-col-header.today .week-col-daynum {
+  background: #3b82f6;
+  color: #ffffff;
+}
+
+.week-col-header.milestone .week-col-daynum {
+  color: #f59e0b;
+}
+
+.week-grid-columns {
+  display: grid;
+  grid-template-columns: repeat(var(--week-cols, 7), minmax(140px, 1fr));
+  gap: 0.5rem;
+  align-items: stretch;
+}
+
+.week-day-column {
+  background: rgba(0, 0, 0, 0.15);
+  border: 1px solid var(--border, #2e3544);
+  border-radius: 8px;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  min-height: 480px;
+}
+
+.week-day-column.today {
+  border-color: rgba(59, 130, 246, 0.4);
+  background: rgba(59, 130, 246, 0.03);
+}
+
+/* Cartões de Rotina na Semana (estilo Google Calendar) */
+.week-routine-card {
+  background: #1e293b;
+  border-left: 4px solid #3b82f6;
+  border-radius: 6px;
+  padding: 0.45rem 0.55rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.week-routine-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.35);
+}
+
+.week-routine-card.improvement {
+  border-left-color: #10b981;
+  background: #064e3b;
+}
+
+.week-routine-card.moral_debt {
+  border-left-color: #f59e0b;
+  background: #451a03;
+}
+
+.week-routine-card.done {
+  opacity: 0.5;
+  text-decoration: line-through;
+}
+
+.week-card-time {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #93c5fd;
+}
+
+.week-routine-card.improvement .week-card-time { color: #6ee7b7; }
+.week-routine-card.moral_debt .week-card-time { color: #fcd34d; }
+
+.week-card-title {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #f8fafc;
+  line-height: 1.25;
+}
+
+.week-card-meta {
+  font-size: 0.65rem;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.week-day-empty {
+  font-size: 0.75rem;
+  color: var(--text-secondary, #64748b);
+  text-align: center;
+  padding: 1.5rem 0.5rem;
+  margin: auto 0;
+}
+
+.week-day-footer {
+  margin-top: auto;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  text-align: center;
+}
+
+.week-day-footer a {
+  font-size: 0.72rem;
+  color: #3b82f6;
+  text-decoration: none;
   font-weight: 600;
 }
 
-.badge-imp {
-  background: rgba(16, 185, 129, 0.2);
-  color: #10b981;
+.week-day-footer a:hover {
+  text-decoration: underline;
 }
 
-.badge-debt {
-  background: rgba(239, 68, 68, 0.2);
-  color: #ef4444;
+/* ========================================================
+   3. MODAL DE RESUMO DO DIA
+   ======================================================== */
+.day-dialog {
+  border: 1px solid var(--border, #2e3544);
+  border-radius: 12px;
+  background: var(--surface, #1e222b);
+  color: var(--text-primary, #f1f5f9);
+  padding: 1.25rem;
+  max-width: 500px;
+  width: 90vw;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
 }
 
-.cell-summary {
+.day-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(2px);
+}
+
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.dialog-header h2 {
+  margin: 0 0 0.25rem;
+  font-size: 1.2rem;
+}
+
+.dialog-day-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  max-height: 340px;
+  overflow-y: auto;
+  margin-bottom: 1.25rem;
+  padding-right: 4px;
+}
+
+.dialog-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border, #2e3544);
+  padding: 0.45rem 0.65rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+}
+
+.dialog-item-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dialog-item-time {
   font-size: 0.75rem;
-  color: var(--text-secondary, #94a3b8);
-  margin: 0;
+  font-weight: 700;
+  color: #60a5fa;
+  min-width: 42px;
 }
 
-.cell-action {
-  font-size: 0.7rem;
-  color: #3b82f6;
-  text-align: right;
-  margin-top: 0.25rem;
-  font-weight: 500;
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
 }
 
-/* Adaptação Mobile e Chrome do iPhone 11 */
-@media (max-width: 768px) {
+.button-primary {
+  display: inline-block;
+  background: #3b82f6;
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.button-primary:hover {
+  background: #2563eb;
+}
+
+/* Helpers */
+.hidden { display: none !important; }
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+/* Responsividade Mobile e iPhone 11 */
+@media (max-width: 900px) {
+  .calendar-workspace {
+    flex-direction: column;
+  }
+
+  .calendar-sidebar {
+    width: 100%;
+  }
+
   .month-heading {
     flex-direction: column;
     align-items: stretch;
   }
 
-  .month-controls {
-    justify-content: space-between;
+  .calendar-toolbar {
     width: 100%;
+    justify-content: space-between;
   }
 
-  .month-controls button {
-    flex: 1;
-    text-align: center;
+  .month-controls button,
+  .view-toggle-btn {
+    padding: 0.35rem 0.6rem;
+    font-size: 0.8rem;
   }
 
   .calendar-grid-header {
-    grid-template-columns: repeat(7, minmax(46px, 1fr));
-    font-size: 0.75rem;
+    grid-template-columns: repeat(7, minmax(44px, 1fr));
+    font-size: 0.7rem;
   }
 
   .calendar-grid {
-    grid-template-columns: repeat(7, minmax(46px, 1fr));
-    gap: 0.25rem;
+    grid-template-columns: repeat(7, minmax(44px, 1fr));
+    gap: 2px;
   }
 
   .calendar-cell {
-    min-height: 80px;
-    padding: 0.35rem 0.25rem;
+    min-height: 85px;
+    padding: 0.25rem 0.2rem;
   }
 
   .cell-number {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
   }
 
-  .milestone-tag {
-    font-size: 0.55rem;
+  .routine-chip {
     padding: 1px 2px;
+    font-size: 0.65rem;
   }
 
-  .cell-summary {
+  .chip-time {
     display: none;
   }
 
-  .cell-action {
+  .milestone-tag {
     display: none;
   }
 }

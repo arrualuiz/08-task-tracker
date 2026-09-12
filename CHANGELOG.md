@@ -1,5 +1,16 @@
 # Histórico do projeto
 
+## 2026-09-12 — Visão integrada de Mês Completo, Mês Reduzido (Mini-mês) e Semana Certinha com rotinas diárias
+
+- Alternador de visões na aba Mês & Semana (`/mes`): Mês Completo, Semana Certinha e Mês Reduzido (Mini-calendário lateral).
+- Visão de Mês Completo com rotinas diárias listadas diretamente em cada célula de dia, com horários, chips coloridos por propósito e botão expansível "+ Mais N" para inspeção completa.
+- Visão de Semana ("semana certinha") com colunas detalhadas por dia, faixas de horários e blocos cronológicos de rotinas (estilo visual da grade semanal do Google Calendar).
+- Mini-mês compacto na barra lateral com navegação ágil de meses e seleção imediata da semana ativa e dias.
+- Projeção automática de rotinas recorrentes ativas para todos os dias do período, mantendo a regra de que rotinas projetadas não contam como concluídas até serem salvas ou planejadas.
+- Novo endpoint `GET /api/overview/week?date=YYYY-MM-DD&start=MO` retornando a semana com suas rotinas diárias e estatísticas.
+- Filtros rápidos de rotina por conta e propósito na barra lateral.
+- Testes automatizados cobrindo o novo endpoint semanal e integridade dos dados; sem push.
+
 ## 2026-09-12 — Visão mensal com marcos periódicos, avanço e separação de melhorias vs dívidas morais
 
 - Nova aba Mês & Avanço (`/mes`) com grade mensal de 30/31 dias, visualização panorâmica e atalho direto para planejamento diário.

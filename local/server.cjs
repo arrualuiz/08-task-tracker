@@ -62,6 +62,11 @@ function createServer(store, calendars = null) {
         const month = url.searchParams.get('month') || new Date().toISOString().slice(5, 7);
         return json(200, store.planning.month(year, month));
       }
+      if (req.method === 'GET' && url.pathname === '/api/overview/week') {
+        const date = url.searchParams.get('date') || new Date().toISOString().slice(0, 10);
+        const start = url.searchParams.get('start') || 'MO';
+        return json(200, store.planning.week(date, start));
+      }
       if (req.method === 'GET' && url.pathname === '/api/overview/progress') {
         const days = Number(url.searchParams.get('days') || 14);
         const ref = url.searchParams.get('date');
