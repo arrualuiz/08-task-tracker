@@ -57,6 +57,21 @@ function createServer(store, calendars = null) {
         try { input = JSON.parse(body); } catch { return json(400, {error:'JSON inválido.'}); }
         return json(200, store.planning.save(planMatch[1], input));
       }
+      if (req.method === 'GET' && url.pathname === '/api/overview/month') {
+        const year = url.searchParams.get('year') || new Date().toISOString().slice(0, 4);
+        const month = url.searchParams.get('month') || new Date().toISOString().slice(5, 7);
+        return json(200, store.planning.month(year, month));
+      }
+      if (req.method === 'GET' && url.pathname === '/api/overview/progress') {
+        const days = Number(url.searchParams.get('days') || 14);
+        const ref = url.searchParams.get('date');
+        return json(200, store.planning.progress(days, ref));
+      }
+      if (req.method === 'GET' && url.pathname === '/api/overview/range') {
+        const start = url.searchParams.get('start');
+        const end = url.searchParams.get('end');
+        return json(200, store.planning.range(start, end));
+      }
       if (req.method === 'GET' && url.pathname === '/api/routines') return json(200, { routines: store.list() });
       if (req.method === 'GET' && url.pathname === '/api/export') {
         res.setHeader('Content-Disposition', 'attachment; filename="task-tracker-backup.json"');
@@ -75,7 +90,22 @@ function createServer(store, calendars = null) {
         try { input = JSON.parse(body); } catch { return json(400, { error: 'JSON inválido.' }); }
         return json(200, { routine: store.update(match[1], input) });
       }
-      const files = { '/': ['dia.html', 'text/html'], '/dia.js': ['dia.js', 'text/javascript'], '/dia.css': ['dia.css', 'text/css'], '/tarefas': ['tarefas.html', 'text/html'], '/tarefas.js': ['tarefas.js', 'text/javascript'], '/calendarios': ['calendarios.html', 'text/html'], '/calendarios.js': ['calendarios.js', 'text/javascript'], '/calendarios.css': ['calendarios.css', 'text/css'], '/revisao': ['revisao.html', 'text/html'], '/revisao.js': ['revisao.js', 'text/javascript'], '/revisao.css': ['revisao.css', 'text/css'] };
+      const files = {
+        '/': ['dia.html', 'text/html'],
+        '/dia.js': ['dia.js', 'text/javascript'],
+        '/dia.css': ['dia.css', 'text/css'],
+        '/mes': ['mes.html', 'text/html'],
+        '/mes.js': ['mes.js', 'text/javascript'],
+        '/mes.css': ['mes.css', 'text/css'],
+        '/tarefas': ['tarefas.html', 'text/html'],
+        '/tarefas.js': ['tarefas.js', 'text/javascript'],
+        '/calendarios': ['calendarios.html', 'text/html'],
+        '/calendarios.js': ['calendarios.js', 'text/javascript'],
+        '/calendarios.css': ['calendarios.css', 'text/css'],
+        '/revisao': ['revisao.html', 'text/html'],
+        '/revisao.js': ['revisao.js', 'text/javascript'],
+        '/revisao.css': ['revisao.css', 'text/css']
+      };
       if (req.method === 'GET' && files[url.pathname]) {
         const [file, mime] = files[url.pathname];
         res.writeHead(200, { 'Content-Type': `${mime}; charset=utf-8`, 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff', 'Content-Security-Policy': "default-src 'self'; style-src 'self'; script-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'" });

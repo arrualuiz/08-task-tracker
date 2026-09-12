@@ -1,0 +1,481 @@
+/** Estilos refinados para a visão mensal, marcos periódicos e acompanhamento de avanço. */
+
+.month-main {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.month-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.month-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.month-controls button {
+  min-height: 44px;
+  padding: 0.5rem 1rem;
+}
+
+/* Painel de Avanço e Métricas */
+.progress-section {
+  background: var(--surface, #1e222b);
+  border: 1px solid var(--border, #2e3544);
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.progress-header h2 {
+  margin: 0 0 0.25rem;
+  font-size: 1.25rem;
+  color: var(--text-primary, #f1f5f9);
+}
+
+.period-selector {
+  display: inline-flex;
+  background: rgba(0, 0, 0, 0.25);
+  padding: 3px;
+  border-radius: 8px;
+  border: 1px solid var(--border, #2e3544);
+}
+
+.period-btn {
+  background: transparent;
+  color: var(--text-secondary, #94a3b8);
+  border: none;
+  padding: 0.4rem 0.85rem;
+  font-size: 0.85rem;
+  border-radius: 6px;
+  cursor: pointer;
+  min-height: 38px;
+  transition: all 0.15s ease;
+}
+
+.period-btn:hover {
+  color: #fff;
+}
+
+.period-btn.active {
+  background: var(--primary, #3b82f6);
+  color: #ffffff;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.4);
+}
+
+/* Grade de Métricas */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.metric-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border, #2e3544);
+  border-radius: 10px;
+  padding: 1rem;
+  display: flex;
+  gap: 0.85rem;
+  align-items: flex-start;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.metric-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.metric-icon {
+  font-size: 1.75rem;
+  line-height: 1;
+}
+
+.metric-label {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-secondary, #94a3b8);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.25rem;
+}
+
+.metric-value-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.metric-value {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.metric-sub {
+  font-size: 0.85rem;
+  color: var(--text-secondary, #94a3b8);
+}
+
+.metric-footnote {
+  font-size: 0.75rem;
+  color: var(--text-secondary, #94a3b8);
+  margin: 0;
+}
+
+.metric-bar-bg {
+  background: rgba(0, 0, 0, 0.3);
+  height: 6px;
+  border-radius: 3px;
+  overflow: hidden;
+  width: 100%;
+  min-width: 140px;
+}
+
+.metric-bar-fill {
+  background: #3b82f6;
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.4s ease;
+}
+
+.debt-fill {
+  background: #f59e0b;
+}
+
+.improvement-fill {
+  background: #10b981;
+}
+
+/* Linha do tempo de consistência */
+.timeline-container h3 {
+  font-size: 0.95rem;
+  color: var(--text-secondary, #94a3b8);
+  margin: 0 0 0.75rem;
+  font-weight: 500;
+}
+
+.progress-timeline {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+  -webkit-overflow-scrolling: touch;
+}
+
+.timeline-day {
+  flex: 1;
+  min-width: 52px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--border, #2e3544);
+  border-radius: 8px;
+  padding: 0.5rem 0.25rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  min-height: 70px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.timeline-day:hover {
+  background: rgba(59, 130, 246, 0.1);
+  border-color: #3b82f6;
+}
+
+.timeline-day.today {
+  border-color: #3b82f6;
+  background: rgba(59, 130, 246, 0.15);
+}
+
+.timeline-day-date {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-primary, #f1f5f9);
+}
+
+.timeline-day-status {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 2px 4px;
+  border-radius: 4px;
+  margin-top: 4px;
+}
+
+.status-full {
+  background: rgba(16, 185, 129, 0.2);
+  color: #10b981;
+}
+
+.status-partial {
+  background: rgba(245, 158, 11, 0.2);
+  color: #f59e0b;
+}
+
+.status-empty {
+  color: var(--text-secondary, #64748b);
+  font-weight: normal;
+}
+
+/* Legenda */
+.month-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary, #94a3b8);
+  padding: 0.5rem 0;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.legend-badge {
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.milestone-badge {
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid #f59e0b;
+  color: #f59e0b;
+}
+
+.improvement-badge {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid #10b981;
+  color: #10b981;
+}
+
+.debt-badge {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid #ef4444;
+  color: #ef4444;
+}
+
+.weekend-badge {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border, #2e3544);
+  color: var(--text-primary, #f1f5f9);
+}
+
+/* Grade do Mês */
+.calendar-grid-section {
+  background: var(--surface, #1e222b);
+  border: 1px solid var(--border, #2e3544);
+  border-radius: 12px;
+  padding: 1rem;
+  overflow-x: auto;
+}
+
+.calendar-grid-header {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(130px, 1fr));
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  text-align: center;
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--text-secondary, #94a3b8);
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--border, #2e3544);
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(130px, 1fr));
+  gap: 0.5rem;
+}
+
+.calendar-cell {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border, #2e3544);
+  border-radius: 8px;
+  min-height: 105px;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  position: relative;
+}
+
+.calendar-cell:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: #3b82f6;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.calendar-cell.pad {
+  opacity: 0.25;
+  cursor: default;
+  pointer-events: none;
+  background: transparent;
+  border-style: dashed;
+}
+
+/* Destaque para os marcos periódicos 05, 10, 15, 20, 25, 30 */
+.calendar-cell.milestone {
+  border: 1px solid #f59e0b;
+  background: rgba(245, 158, 11, 0.06);
+  box-shadow: inset 0 0 12px rgba(245, 158, 11, 0.08);
+}
+
+.calendar-cell.milestone:hover {
+  border-color: #fbbf24;
+  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.25);
+}
+
+.calendar-cell.weekend {
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.calendar-cell.today {
+  border: 2px solid #3b82f6;
+}
+
+.cell-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.4rem;
+}
+
+.cell-number {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary, #f1f5f9);
+}
+
+.milestone-tag {
+  font-size: 0.65rem;
+  font-weight: 700;
+  background: #f59e0b;
+  color: #1a1500;
+  padding: 1px 4px;
+  border-radius: 3px;
+  letter-spacing: 0.02em;
+}
+
+.cell-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.cell-badge-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.cell-badge {
+  font-size: 0.7rem;
+  padding: 1px 4px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.badge-imp {
+  background: rgba(16, 185, 129, 0.2);
+  color: #10b981;
+}
+
+.badge-debt {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+}
+
+.cell-summary {
+  font-size: 0.75rem;
+  color: var(--text-secondary, #94a3b8);
+  margin: 0;
+}
+
+.cell-action {
+  font-size: 0.7rem;
+  color: #3b82f6;
+  text-align: right;
+  margin-top: 0.25rem;
+  font-weight: 500;
+}
+
+/* Adaptação Mobile e Chrome do iPhone 11 */
+@media (max-width: 768px) {
+  .month-heading {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .month-controls {
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .month-controls button {
+    flex: 1;
+    text-align: center;
+  }
+
+  .calendar-grid-header {
+    grid-template-columns: repeat(7, minmax(46px, 1fr));
+    font-size: 0.75rem;
+  }
+
+  .calendar-grid {
+    grid-template-columns: repeat(7, minmax(46px, 1fr));
+    gap: 0.25rem;
+  }
+
+  .calendar-cell {
+    min-height: 80px;
+    padding: 0.35rem 0.25rem;
+  }
+
+  .cell-number {
+    font-size: 0.85rem;
+  }
+
+  .milestone-tag {
+    font-size: 0.55rem;
+    padding: 1px 2px;
+  }
+
+  .cell-summary {
+    display: none;
+  }
+
+  .cell-action {
+    display: none;
+  }
+}

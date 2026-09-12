@@ -6,6 +6,6 @@
   "scripts": {
     "start": "node local/server.cjs",
     "test": "node --test local/store.test.cjs local/calendars.test.cjs",
-    "check": "node --check local/server.cjs && node --check local/store.cjs && node --check local/planner.cjs && node --check local/calendars.cjs && node --check local/google-tasks.cjs && node --check site/revisao.js && node --check site/dia.js && node --check site/calendarios.js && node --check site/tarefas.js"
+    "check": "node --check local/server.cjs && node --check local/store.cjs && node --check local/planner.cjs && node --check local/calendars.cjs && node --check local/google-tasks.cjs && node --check site/revisao.js && node --check site/dia.js && node --check site/calendarios.js && node --check site/tarefas.js && node --check site/mes.js"
   }
 }

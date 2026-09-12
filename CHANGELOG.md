@@ -1,5 +1,15 @@
 # Histórico do projeto
 
+## 2026-09-12 — Visão mensal com marcos periódicos, avanço e separação de melhorias vs dívidas morais
+
+- Nova aba Mês & Avanço (`/mes`) com grade mensal de 30/31 dias, visualização panorâmica e atalho direto para planejamento diário.
+- Destaque específico para os marcos periódicos de dias 05, 10, 15, 20, 25 e 30 com etiqueta de revisão e estilo diferenciado.
+- Classificação de propósito pessoal para tarefas e rotinas: Melhorias (evolução, hábitos, saúde), Dívidas Morais (pendências atrasadas) e Rotina/Manutenção.
+- Painel de avanço recente com taxa de realização, saldo de dívidas morais quitadas de pendentes, melhorias conquistadas e consistência diária nos últimos 7, 14 ou 30 dias.
+- Divisão contextual de rotinas por dia de semana (Seg a Sex), final de semana (Sáb e Dom) e rotinas especiais de quarta-feira (sem aula / volta direto).
+- Suporte a abertura do planejamento por parâmetro de data na URL (`/?date=YYYY-MM-DD`).
+- Quinze testes automatizados aprovados; verificação de sintaxe de todos os módulos com sucesso; sem push.
+
 ## 2026-09-11 — Mais calendários e consulta Google Tasks
 
 - Limite ampliado de 20 para 200 calendários, seleção em lote e até cinco fontes simultâneas por consulta.

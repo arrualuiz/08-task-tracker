@@ -8,7 +8,7 @@
 <body>
   <!-- A revisão é a atividade principal; situação local permanece sempre visível. -->
   <header><div class="brand"><span class="logo">✓</span><strong>Task Tracker</strong><span class="tag">LOCAL</span></div><a href="/api/export" download>Exportar backup ↗</a></header>
-  <nav class="app-tabs" aria-label="Funções do site"><a href="/">Meu dia</a><a href="/calendarios">Calendários</a><a href="/tarefas">Google Tasks</a><a href="/revisao" aria-current="page">Revisão de rotinas</a></nav>
+  <nav class="app-tabs" aria-label="Funções do site"><a href="/">Meu dia</a><a href="/mes">Mês & Avanço</a><a href="/calendarios">Calendários</a><a href="/tarefas">Google Tasks</a><a href="/revisao" aria-current="page">Revisão de rotinas</a></nav>
   <main>
     <a href="/">← Voltar para meu dia</a><div class="intro"><div><p class="eyebrow">SUAS ROTINAS</p><h1>Revisão de rotinas</h1><p>Organize a rotina que você já tem. Uma mudança de cada vez.</p></div><div class="local-note"><span class="dot"></span> Salvo neste computador<br><small>Google ainda não conectado</small></div></div>
     <section class="stats" aria-label="Resumo"><div><span id="total">—</span> rotinas importadas</div><div><span id="pending">—</span> para revisar</div><div><span id="approved">—</span> aprovadas</div><div><span id="paused">—</span> pausadas</div></section>
@@ -25,6 +25,7 @@
           <label>Título<input name="title" required maxlength="300"></label>
           <div class="pair"><label>Categoria<input name="category" list="categories" required maxlength="300"></label><label>Conta de destino<input name="account" list="accounts" required maxlength="300"></label></div><datalist id="categories"></datalist><datalist id="accounts"></datalist><p class="hint">O nome da conta organiza a revisão. A vinculação ao Google será feita depois.</p>
           <div class="pair"><label>Tipo de item<select name="kind"><option value="task">Tarefa para fazer</option><option value="appointment">Compromisso com horário</option><option value="info">Informação / disponibilidade</option></select></label><label>Situação da revisão<select name="status"><option value="pending">Para revisar</option><option value="approved">Aprovada para o planejamento</option><option value="paused">Pausada</option></select></label></div>
+          <label>Classificação de propósito<select name="purpose"><option value="maintenance">🔄 Rotina / Manutenção diária</option><option value="improvement">🌟 Melhoria (hábito, saúde, estudos, evolução)</option><option value="moral_debt">⏳ Dívida Moral (pendência que pesa na consciência)</option></select></label>
           <!-- Aprovação pertence à rotina; execução diária será uma entidade separada. -->
           <p class="hint">Aprovar prepara a rotina para o planejamento. Não marca como concluída nem cria eventos no Google.</p>
           <fieldset><legend>Quando acontece</legend><div class="triple"><label>Data inicial<input name="date" type="date" required></label><label>Horário (opcional)<input name="time" type="time"></label><label>Duração em minutos<input name="duration" type="number" min="0" max="10080" required></label></div><p class="hint">Duração 0 significa duração não definida.</p>

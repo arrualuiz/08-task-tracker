@@ -9,7 +9,18 @@ Criar e acompanhar tarefas no computador e no Chrome do iPhone 11, sem instalar 
 
 ## O que existe no código
 
-### Entrega atual: 200 calendários e Google Tasks (11/09/2026)
+### Entrega atual: Mês com marcos periódicos, avanço e melhorias vs dívidas morais (12/09/2026)
+
+A aba **Mês & Avanço** (`/mes`, `site/mes.html`, `mes.js`, `mes.css`) oferece uma grade mensal completa de 30/31 dias com destaque específico nos **marcos periódicos dos dias 05, 10, 15, 20, 25 e 30**, identificação de fins de semana e atalho com 1 clique para o planejamento diário de cada data.
+
+As tarefas e rotinas ganharam o campo `purpose`, permitindo distinguir três naturezas de atividade:
+- 🌟 **Melhoria**: hábitos de crescimento pessoal, exercícios, estudos e projetos de futuro.
+- ⏳ **Dívida Moral**: tarefas acumuladas e compromissos que pesam na consciência e precisam ser quitados.
+- 🔄 **Rotina / Manutenção**: atividades neutras de sustentação diária.
+
+O painel de avanço recente exibe a taxa de realização (% concluído), saldo de dívidas morais pagas vs pendentes, melhorias conquistadas e linha do tempo de consistência nos últimos 7, 14 ou 30 dias. No **Meu dia**, o painel de sugestões agora divide o contexto entre dias de semana (Seg a Sex), finais de semana (Sáb e Dom) e a rotina de quarta-feira (sem aula / volta direto), além de suportar carregamento direto por parâmetro de URL (`/?date=YYYY-MM-DD`).
+
+Quinze testes isolados aprovados, cobrindo persistência, integridade do histórico, consultas mensais e cálculo do progresso.
 
 O limite passou de 20 para **200 calendários por consulta**, com seleção em lote e até cinco fontes simultâneas. A paginação e os avisos de consulta incompleta são preservados.
 

@@ -52,8 +52,14 @@ function validate(value) {
   if (!r || !['ONCE', 'DAILY', 'WEEKLY', 'MONTHLY'].includes(r.frequency)) fail('Frequência inválida.');
   if (!Array.isArray(r.days) || r.days.some(d => !days.includes(d)) || new Set(r.days).size !== r.days.length || (r.frequency === 'WEEKLY' && !r.days.length)) fail('Escolha os dias da semana.');
   if (!['date', 'weekday'].includes(r.monthlyMode) || !Number.isInteger(r.monthDay) || r.monthDay < 1 || r.monthDay > 31 || !Number.isInteger(r.ordinal) || r.ordinal < 1 || r.ordinal > 5 || !days.includes(r.weekday)) fail('Repetição mensal inválida.');
+  const validPurposes = ['improvement', 'moral_debt', 'maintenance'];
+  const purpose = value.purpose || 'maintenance';
+  if (!validPurposes.includes(purpose)) fail('Classificação de propósito inválida (escolha melhoria, dívida moral ou manutenção).');
   // Lista explícita impede alteração dos IDs, origem e histórico via API.
-  return Object.fromEntries(['title', 'category', 'account', 'status', 'kind', 'date', 'time', 'duration', 'notes', 'recurrence'].map(key => [key, value[key]]));
+  return {
+    ...Object.fromEntries(['title', 'category', 'account', 'status', 'kind', 'date', 'time', 'duration', 'notes', 'recurrence'].map(key => [key, value[key]])),
+    purpose
+  };
 }
 
 function openStore(filename, inventoryFile) {
@@ -94,7 +100,11 @@ function openStore(filename, inventoryFile) {
       db.prepare("INSERT INTO metadata VALUES('instance',?)").run(randomUUID());
     });
   }
-  const unpack = row => row && ({ id: row.id, ...JSON.parse(row.data), source: JSON.parse(row.source), version: row.version, updatedAt: row.updated_at });
+  const unpack = row => {
+    if (!row) return null;
+    const data = JSON.parse(row.data);
+    return { id: row.id, ...data, purpose: data.purpose || 'maintenance', source: JSON.parse(row.source), version: row.version, updatedAt: row.updated_at };
+  };
   const get = id => unpack(db.prepare('SELECT * FROM routines WHERE id=?').get(id));
   const planning = require('./planner.cjs').planner(db, transaction);
   return {

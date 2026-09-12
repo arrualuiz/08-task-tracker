@@ -58,7 +58,7 @@ function toggleSchedule() {
 }
 function selectRoutine(r) {
   selected = r; dirty = false; form.hidden = false; $('empty').hidden = true;
-  for (const name of ['title','category','account','kind','status','date','time','duration','notes']) field(name).value = r[name];
+  for (const name of ['title','category','account','kind','status','purpose','date','time','duration','notes']) if (field(name)) field(name).value = r[name] || (name === 'purpose' ? 'maintenance' : '');
   for (const name of ['frequency','monthDay','ordinal','weekday','monthlyMode']) field(name).value = r.recurrence[name];
   document.querySelectorAll('[name=days]').forEach(input => input.checked = r.recurrence.days.includes(input.value));
   $('editor-title').textContent = r.title; $('version').textContent = `VERSÃO ${r.version}`;
@@ -69,7 +69,7 @@ function selectRoutine(r) {
   $('save-state').textContent = `Salvo · ${new Date(r.updatedAt).toLocaleString('pt-BR')}`;
   $('save').disabled = true; toggleSchedule(); renderList(); loadHistory(r.id);
 }
-const labels = { title:'Título',category:'Categoria',account:'Conta',kind:'Tipo',status:'Situação',date:'Data inicial',time:'Horário',duration:'Duração',notes:'Observações',recurrence:'Repetição' };
+const labels = { title:'Título',category:'Categoria',account:'Conta',kind:'Tipo',status:'Situação',purpose:'Propósito',date:'Data inicial',time:'Horário',duration:'Duração',notes:'Observações',recurrence:'Repetição' };
 async function loadHistory(id) {
   const request = ++historyRequest;
   $('history').textContent = 'Carregando histórico…';
@@ -94,7 +94,7 @@ async function loadHistory(id) {
 }
 function draft() {
   const data = { version:selected.version };
-  for (const name of ['title','category','account','kind','status','date','time','notes']) data[name] = field(name).value.trim();
+  for (const name of ['title','category','account','kind','status','purpose','date','time','notes']) data[name] = field(name).value.trim();
   data.duration = Number(field('duration').value);
   data.recurrence = { frequency:field('frequency').value, days:[...document.querySelectorAll('[name=days]:checked')].map(input => input.value), monthDay:Number(field('monthDay').value), ordinal:Number(field('ordinal').value), weekday:field('weekday').value, monthlyMode:field('monthlyMode').value };
   return data;

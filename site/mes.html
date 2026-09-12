@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mês & Avanço · Task Tracker</title>
+  <link rel="stylesheet" href="/dia.css">
+  <link rel="stylesheet" href="/calendarios.css">
+  <link rel="stylesheet" href="/mes.css">
+  <script src="/mes.js" defer></script>
+</head>
+<body>
+  <header>
+    <a class="brand" href="/">✓ <strong>Task Tracker</strong></a>
+    <a href="/api/export" download>Backup do planejamento</a>
+  </header>
+
+  <nav class="app-tabs" aria-label="Funções do site">
+    <a href="/">Meu dia</a>
+    <a href="/mes" aria-current="page">Mês & Avanço</a>
+    <a href="/calendarios">Calendários</a>
+    <a href="/tarefas">Google Tasks</a>
+    <a href="/revisao">Revisão de rotinas</a>
+  </nav>
+
+  <main class="month-main">
+    <!-- Cabeçalho da página com navegação entre meses -->
+    <div class="month-heading">
+      <div>
+        <p class="eyebrow">VISÃO PANORÂMICA & EVOLUÇÃO</p>
+        <h1 id="month-title">Mês & Avanço</h1>
+        <p>Acompanhe seus marcos periódicos, a consistência dos seus dias e o saldo entre dívidas morais e melhorias.</p>
+      </div>
+      <div class="month-controls">
+        <button id="prev-month" class="secondary" type="button" aria-label="Mês anterior">← Mês anterior</button>
+        <button id="today-month" class="secondary" type="button">Hoje</button>
+        <button id="next-month" class="secondary" type="button" aria-label="Próximo mês">Próximo mês →</button>
+      </div>
+    </div>
+
+    <!-- Painel de Avanço e Métricas Recentes -->
+    <section class="progress-section" aria-label="Métricas de avanço recente">
+      <div class="progress-header">
+        <div>
+          <h2>Avanço nos últimos dias</h2>
+          <p class="hint">Veja se você está avançando, quitando pendências acumuladas e construindo melhorias.</p>
+        </div>
+        <div class="period-selector" role="group" aria-label="Período do avanço">
+          <button id="period-7" class="period-btn" type="button" data-days="7">Últimos 7 dias</button>
+          <button id="period-14" class="period-btn active" type="button" data-days="14">Últimos 14 dias</button>
+          <button id="period-30" class="period-btn" type="button" data-days="30">Últimos 30 dias</button>
+        </div>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric-card rate-card">
+          <span class="metric-icon">📈</span>
+          <div>
+            <span class="metric-label">Taxa de Realização</span>
+            <div class="metric-value-row">
+              <strong id="metric-rate" class="metric-value">0%</strong>
+              <span id="metric-tasks-ratio" class="metric-sub">0 de 0 tarefas</span>
+            </div>
+            <div class="metric-bar-bg">
+              <div id="metric-rate-bar" class="metric-bar-fill" style="width: 0%"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="metric-card debt-card">
+          <span class="metric-icon">⏳</span>
+          <div>
+            <span class="metric-label">Dívidas Morais Quitadas</span>
+            <div class="metric-value-row">
+              <strong id="metric-debts-paid" class="metric-value">0</strong>
+              <span id="metric-debts-ratio" class="metric-sub">de 0 pendências</span>
+            </div>
+            <div class="metric-bar-bg">
+              <div id="metric-debts-bar" class="metric-bar-fill debt-fill" style="width: 0%"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="metric-card improvement-card">
+          <span class="metric-icon">🌟</span>
+          <div>
+            <span class="metric-label">Melhorias Conquistadas</span>
+            <div class="metric-value-row">
+              <strong id="metric-improvements-done" class="metric-value">0</strong>
+              <span id="metric-improvements-ratio" class="metric-sub">de 0 planejadas</span>
+            </div>
+            <div class="metric-bar-bg">
+              <div id="metric-improvements-bar" class="metric-bar-fill improvement-fill" style="width: 0%"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="metric-card consistency-card">
+          <span class="metric-icon">🎯</span>
+          <div>
+            <span class="metric-label">Dias com Planejamento</span>
+            <div class="metric-value-row">
+              <strong id="metric-active-days" class="metric-value">0</strong>
+              <span id="metric-period-days" class="metric-sub">de 14 dias</span>
+            </div>
+            <p id="metric-consistency-hint" class="metric-footnote">Constância diária</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Linha do tempo de consistência recente -->
+      <div class="timeline-container">
+        <h3>Consistência diária no período</h3>
+        <div id="progress-timeline" class="progress-timeline" role="list"></div>
+      </div>
+    </section>
+
+    <!-- Legenda dos marcos periódicos e tipos de propósito -->
+    <div class="month-legend">
+      <span class="legend-item"><span class="legend-badge milestone-badge">★ Dia 05, 10, 15, 20, 25, 30</span> Marcos periódicos & revisões</span>
+      <span class="legend-item"><span class="legend-badge improvement-badge">🌟 Melhoria</span> Hábito / Evolução pessoal</span>
+      <span class="legend-item"><span class="legend-badge debt-badge">⏳ Dívida Moral</span> Pendência pesada / Débito moral</span>
+      <span class="legend-item"><span class="legend-badge weekend-badge">Fim de semana</span> Rotinas de descanso e lazer</span>
+    </div>
+
+    <!-- Mensagem de status -->
+    <p id="month-notice" role="status" aria-live="polite">Carregando calendário do mês…</p>
+
+    <!-- Grade do Mês -->
+    <section class="calendar-grid-section" aria-label="Grade do mês">
+      <div class="calendar-grid-header">
+        <span>Dom</span>
+        <span>Seg</span>
+        <span>Ter</span>
+        <span>Qua</span>
+        <span>Qui</span>
+        <span>Sex</span>
+        <span>Sáb</span>
+      </div>
+      <div id="calendar-grid" class="calendar-grid"></div>
+    </section>
+  </main>
+</body>
+</html>

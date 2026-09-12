@@ -105,3 +105,65 @@ test('API salva e exporta, restringe origem e não serve arquivos privados',asyn
   assert.equal((await fetch(`${base}/api/routines/${item.id}`,{method:'PUT',headers:{'Content-Type':'application/json'},body:'not json'})).status,400);
   for (const url of ['/dados-locais/task-tracker.sqlite','/config.js','/apps-script/Code.gs','/../README.md']) assert.equal((await fetch(base+url)).status,404);
 });
+
+test('classificação de propósito (melhorias e dívidas morais) persiste e calcula métricas do mês e progresso', async t => {
+  const context = setup(t);
+  const routine = context.store.list()[0];
+  // Atualizar rotina com propósito de melhoria
+  const updatedRoutine = context.store.update(routine.id, { ...routine, purpose: 'improvement' });
+  assert.equal(updatedRoutine.purpose, 'improvement');
+
+  // Adicionar tarefas com dívida moral e melhoria em 2026-09-05 (um marco periódico)
+  const itemMoral = { id: '33333333-3333-4333-8333-333333333333', routineId: null, title: 'Resolver pendência atrasada', block: 'morning', kind: 'task', time: '', duration: 0, notes: '', account: '', done: true, purpose: 'moral_debt' };
+  const itemImprove = { id: '44444444-4444-4444-8444-444444444444', routineId: routine.id, title: 'Treinar 45min', block: 'afternoon', kind: 'task', time: '17:00', duration: 45, notes: '', account: '', done: true, purpose: 'improvement' };
+  const itemRoutine = { id: '55555555-5555-4555-8555-555555555555', routineId: null, title: 'Lavar louça', block: 'evening', kind: 'task', time: '', duration: 0, notes: '', account: '', done: false, purpose: 'maintenance' };
+
+  context.store.planning.save('2026-09-05', { version: 0, items: [itemMoral, itemImprove, itemRoutine] });
+
+  // Outro dia: 2026-09-06 com dívida moral não paga
+  const itemMoralPending = { id: '66666666-6666-4666-8666-666666666666', routineId: null, title: 'Enviar e-mail adiado', block: 'morning', kind: 'task', time: '', duration: 0, notes: '', account: '', done: false, purpose: 'moral_debt' };
+  context.store.planning.save('2026-09-06', { version: 0, items: [itemMoralPending] });
+
+  // Testar mês (2026-09)
+  const monthData = context.store.planning.month(2026, 9);
+  assert.equal(monthData.totalDays, 30);
+  const day05 = monthData.days.find(d => d.day === 5);
+  assert.equal(day05.isPeriodicMilestone, true);
+  assert.equal(day05.hasPlan, true);
+  assert.equal(day05.stats.total, 3);
+  assert.equal(day05.stats.completed, 2);
+  assert.equal(day05.stats.moralDebts, 1);
+  assert.equal(day05.stats.moralDebtsDone, 1);
+  assert.equal(day05.stats.improvements, 1);
+  assert.equal(day05.stats.improvementsDone, 1);
+
+  const day10 = monthData.days.find(d => d.day === 10);
+  assert.equal(day10.isPeriodicMilestone, true);
+  assert.equal(day10.hasPlan, false);
+
+  // Testar progresso dos últimos 7 dias até 2026-09-07
+  const progress = context.store.planning.progress(7, '2026-09-07');
+  assert.equal(progress.totalTasks, 4);
+  assert.equal(progress.completedTasks, 2);
+  assert.equal(progress.completionRate, 50);
+  assert.equal(progress.moralDebtsTotal, 2);
+  assert.equal(progress.moralDebtsPaid, 1);
+  assert.equal(progress.moralDebtsPending, 1);
+  assert.equal(progress.improvementsTotal, 1);
+  assert.equal(progress.improvementsAchieved, 1);
+
+  // Testar endpoints HTTP no servidor
+  const server = createServer(context.store);
+  await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+  t.after(() => new Promise(resolve => server.close(resolve)));
+  const base = `http://127.0.0.1:${server.address().port}`;
+
+  const monthRes = await (await fetch(`${base}/api/overview/month?year=2026&month=09`)).json();
+  assert.equal(monthRes.totalDays, 30);
+  assert.equal(monthRes.days.find(d => d.day === 5).isPeriodicMilestone, true);
+
+  const progressRes = await (await fetch(`${base}/api/overview/progress?days=7&date=2026-09-07`)).json();
+  assert.equal(progressRes.moralDebtsTotal, 2);
+  assert.equal(progressRes.moralDebtsPaid, 1);
+});
+
