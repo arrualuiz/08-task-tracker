@@ -1,5 +1,12 @@
 # Histórico do projeto
 
+## 2026-09-14 — Limpeza de credenciais e meta descriptions
+
+- Credenciais reais (SPREADSHEET_ID e SECRET_TOKEN) removidas do `apps-script/Code.gs`, substituídas por placeholders com instruções de preenchimento. O histórico do Git ainda contém os valores anteriores.
+- Meta descriptions adicionadas em todas as páginas HTML servidas pelo Node (dia, mês, revisão, calendários, tarefas), melhorando SEO e acessibilidade.
+- MAPA-DO-PROJETO atualizado para 14/09/2026 com nota sobre a limpeza realizada.
+- Quinze testes aprovados; verificação de sintaxe de todos os módulos com sucesso; sem push.
+
 ## 2026-09-12 — Visão integrada de Mês Completo, Mês Reduzido (Mini-mês) e Semana Certinha com rotinas diárias
 
 - Alternador de visões na aba Mês & Semana (`/mes`): Mês Completo, Semana Certinha e Mês Reduzido (Mini-calendário lateral).

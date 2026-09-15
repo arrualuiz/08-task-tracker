@@ -1,6 +1,6 @@
 # Mapa do Task Tracker
 
-Levantamento em 08/09/2026, sobre o commit `a5ff0ab` da branch `main`.
+Levantamento em 08/09/2026, atualizado em 14/09/2026, sobre a branch `main`.
 Repositório: https://github.com/arrualuiz/task-tracker
 
 ## Objetivo acordado
@@ -129,7 +129,7 @@ A escolha inicial é Google Calendar, porque já está integrado ao código. Val
 
 ## Pontos encontrados para corrigir durante a evolução
 
-- Há token fixo no backend versionado e o frontend prevê token no navegador. Migrar configuração e autenticação e substituir a credencial antes de publicar a próxima versão; ignorar config.js não remove o segredo do backend nem do histórico.
+- ~~Havia token fixo e SPREADSHEET_ID no `apps-script/Code.gs` e o frontend previa token no navegador.~~ Credenciais removidas do HEAD em 14/09/2026, substituídas por placeholders. O histórico do Git ainda contém os valores antigos; rotacionar o token e considerar `git filter-branch` ou BFG se o repositório se tornar público. `site/config.js` permanece no `.gitignore`.
 - A listagem não percorre páginas de listas/tarefas; pode omitir resultados acima do limite da API.
 - Agrupamento e preferências usam títulos, que podem se repetir ou mudar. Migrar para IDs.
 - O snapshot considera todas as tarefas pendentes, inclusive futuras ou sem data, e todos os eventos de hoje. Não consulta aprovações ou logs de conclusão dos eventos.

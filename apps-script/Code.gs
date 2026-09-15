@@ -11,9 +11,11 @@
  */
 
 // ======================= CONFIGURAÇÃO =======================
-const SPREADSHEET_ID = '1-788_56OT5L5sJyHl1kJwpMvKDSvlRvp6wdW4urdIBE';
+// Preencha com o ID da sua planilha Google Sheets e um token secreto.
+// Nunca commite valores reais neste arquivo; mantenha-os apenas no ambiente do Apps Script.
+const SPREADSHEET_ID = 'SEU_SPREADSHEET_ID_AQUI';
 const SHEET_LOG = 'Log';
-const SECRET_TOKEN = 'c608aa965e214d17a323d82a7c4e2d04';
+const SECRET_TOKEN = 'SEU_TOKEN_SECRETO_AQUI';
 
 // ======================= ROTEAMENTO =======================
 function doGet(e) {
